@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Quién lo dijo?</title>
+<link rel="stylesheet" href="juego-quien-pregunta-congreso.html">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <h1>¿Quién ha preguntado al Gobierno en el Congreso por...?</h1>
+</div>
+
+<div class="container" id="app"></div>
+
+<script>
+const PARTIES = {
+  PP:    { name: 'PP',    color: '#1e4a90' },
+  PSOE:  { name: 'PSOE',  color: '#f31912' },
+  VOX:   { name: 'Vox',   color: '#66bc29' },
+  Sumar: { name: 'Sumar', color: '#e51c55' },
+  ERC:   { name: 'ERC',   color: '#FFB232' },
+  BILDU: { name: 'Bildu', color: '#00c19f' },
+  PNV:   { name: 'PNV',   color: '#499e37' },
+  JUNTS: { name: 'Junts', color: '#00c3b2' },
+  BNG:   { name: 'BNG',   color: '#6aade4' },
+  CC:    { name: 'Coalición Canaria', color: '#ffcb05' },
+  UPN:   { name: 'UPN',   color: '#004a90' },
+  Podemos: { name: 'Podemos', color: '#9169f4' },
+};
+
+const LEVELS = [
+  {
+    id: 1,
+    name: 'Nivel 1 — Fácil',
+    parties: ['PP','VOX','Sumar','BNG'],
+    questions: [
+      { text: '¿Qué medidas adoptará para poner fin a los retrasos continuados e incidencias varias en los servicios ferroviarios de Galicia?', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Actos violentos realizados por la afición ultra del Málaga FC (Frente Bokerón) en la ciudad de A Coruña el sábado 5 y domingo 6 de octubre e inacción del reducido dispositivo policial.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Eliminación del servicio de tren AVANT de las 7:47 horas de Santiago de Compostela a Ourense para las personas usuarias con el nuevo abono recurrente.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Opinión del Gobierno acerca de si el Presidente de Rusia ha injerido en la Unión Europea para desestabilizarla y por ende a nuestro país, agravando el problema catalán.', party: 'PP', author: 'Manuel García Féliz, Belén Hoyo Juliá, Carlos Floriano Corrales...' },
+      { text: 'Iniciativas que planteará el Ministerio de Educación, Formación Profesional y Deportes ante el hecho de que la práctica deportiva es mayoritaria entre hombres, independientemente de la frecuencia.', party: 'PP', author: 'Borja Sémper Pascual, Javier Merino Martínez, Óscar López Clavell...' },
+      { text: 'Creación del registro de personas objetoras de conciencia en relación con el aborto.', party: 'Sumar', author: 'Júlia Boada Danés' },
+      { text: 'Accesibilidad de la iglesia de San Juan de los Panetes, en Zaragoza.', party: 'Sumar', author: 'Jorge Pueyo Sanz' },
+      { text: 'Opinión del Gobierno sobre si el sistema político impuesto en Rusia a partir del golpe de Estado de noviembre de 1917 fue una dictadura, así como actuaciones previstas en relación con la Fundación Federico Engels, teniendo en cuenta que ésta enaltece a los dirigentes de ese sistema político.', party: 'VOX', author: 'Lourdes Méndez Monasterio, Carlos Flores Juberías, Ignacio Gil Lázaro' },
+      { text: 'Posición del Gobierno respecto al aumento de abortos de niños con Síndrome de Down en España, así como medidas previstas para proteger los derechos y la dignidad de las personas con Síndrome de Down.', party: 'VOX', author: 'María de la Cabez Ruiz Solás, Rocío De Meer Méndez, Blanca Armario González' },
+      { text: 'Acciones diplomáticas que ha emprendido o que va a emprender el Gobierno en respuesta al acto de espionaje de Marruecos a través del software Pegasus.', party: 'VOX', author: 'Javier Ortega Smith, Alberto Asrta Cuevas, Ignacio Gil Lázaro' },
+    ]
+  },
+  {
+    id: 2,
+    name: 'Nivel 2 — Medio',
+    parties: ['PP','VOX','Sumar','BNG','ERC','UPN'],
+    questions: [
+      { text: 'Necesidad de mejora del cruce de la N-634 y la AC-840 en el término municipal de Vilasantar.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Actuaciones acometidas y previstas por el Ministerio de Agricultura, Pesca y Alimentación en el término municipal de Avión en los años 2025 y 2026.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: '¿Siguen existiendo las cloacas del Estado?', party: 'ERC', author: 'Francesc-Marc Álvaro Vidal' },
+      { text: 'Trabajadores de la empresa pública EXPASA Agricultura y Ganadería, S.M.E., SA que no hayan acudido a su puesto de trabajo durante más de diez días sin justificación entre los años 2018 y 2023.', party: 'PP', author: 'Santi Rodríguez Serra, Jaime Eduardo de Olano Vela, Álvaro Pérez López...' },
+      { text: 'Acumulación de más de 200 mil bidones con material radiactivo frente a las costas gallegas y medidas adoptadas con respecto a dicho vertido.', party: 'Sumar', author: 'Eloi Badia Casas, Júlia Boada Danés, Manuel Lago Peñas...' },
+      { text: 'Opinión del Gobierno acerca de la colaboración del exjefe de ETA, Mikel Antza, con la Red de Bibliotecas Públicas de Navarra.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Motivos por los que se ha suspendido el \'Programa Reina Letizia para la Inclusión\'.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Iniciativas que ha tomado el Gobierno para denunciar el genocidio de cristianos en Nigeria.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Cierre del puerto de Barbate (Cádiz) con el fin de impedir la toma de fotografías de narcolanchas que se encontraban allí refugiadas, así como medidas previstas para hacer frente al incremento de la presencia de narcolanchas en las costas españolas.', party: 'VOX', author: 'Francisco Javier Ortega Smith-Molina, Blanca Armario González, Ignacio Gil Lázaro...' },
+      { text: 'Avance y estructura del plan de indemnización para las víctimas de abusos sexuales en la Iglesia aprobado por el Gobierno.', party: 'VOX', author: 'Lourdes Méndez Monasterio, Carlos Flores Juberías, Ignacio Gil Lázaro' }
+    ]
+  },
+  {
+    id: 3,
+    name: 'Nivel 3 — Difícil',
+    parties: ['PP','VOX','Sumar','BNG','ERC','UPN','PSOE','Podemos'],
+    questions: [
+      { text: 'Acusaciones de abusos sexuales y corrupción del Embajador del régimen talibán de Afganistán en el Estado español.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Medidas previstas para remediar el memoricidio histórico del Pueblo Gitano.', party: 'ERC', author: 'Jordi Salvador i Duch, Francesc-Marc Álvaro Vidal' },
+      { text: 'Aparición de dos cabezas de lobo colgadas en un puente en Asturias.', party: 'Podemos', author: 'Martina Velarde Gómez' },
+      { text: 'Garantía del Gobierno para finalizar el AVE Madrid-Lisboa, en lo que concierne al territorio nacional, en el año 2030.', party: 'PP', author: 'Alfonso Carlos Macías Gata, Antonio Cavacasillas Rodríguez, Héctor Palencia Rubio' },
+      { text: 'Medidas adoptadas para apoyar al pueblo valenciano tras la DANA.', party: 'PSOE', author: 'María Guijarro Ceballos' },
+      { text: 'Variación del número de mujeres con protección activa por violencia de género en la provincia de Girona desde que Pedro Sánchez es Presidente del Gobierno.', party: 'PSOE', author: 'Blanca Cercas Mena, Marc Lamuà Estañol, José Zaragoza Alonso...' },
+      { text: 'Forma en la que opera el turismo sobre la sequía.', party: 'Sumar', author: 'Alberto Ibáñez Mezquita' },
+      { text: 'Opinión del Gobierno sobre si la Venezuela de Nicolás Maduro es un régimen dictatorial.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Inversiones de Adif en la provincia de Málaga desde el año 2018.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Previsiones acerca de construir alguna infraestructura para evitar el efecto de los temporales sobre las playas de Marbella.', party: 'VOX', author: 'Patricia Rueda Perelló, Carlos Hernández Quero, José María Figaredo Álvarez-Sala...' }
+    ]
+  }
+];
+
+const COUNTDOWN_PARTIES = ['PP','VOX','Sumar','BNG','ERC','UPN','PSOE','Podemos'];
+const COUNTDOWN_QUESTIONS = [
+  ...LEVELS[0].questions,
+  ...LEVELS[1].questions,
+  ...LEVELS[2].questions,
+  { text: 'Ataques a los barcos de Global Sumud Flotilla con ayuda humanitaria para Gaza.', party: 'BNG', author: 'Néstor Rego Candamil' },
+  { text: 'Bloqueos indiscriminados de páginas web por La Liga y Movistar.', party: 'BNG', author: 'Néstor Rego Candamil' },
+  { text: 'Funcionamiento del sistema VioGén.', party: 'BNG', author: 'Néstor Rego Candamil' },
+  { text: '¿Por qué no se ha extinguido la Fundación Nacional Francisco Franco?', party: 'ERC', author: 'Francesc-Marc Álvaro Vidal' },
+  { text: 'Proyecto de ampliación del aeropuerto de El Prat.', party: 'Podemos', author: 'Ione Belarra Urteaga' },
+  { text: 'Previsiones acerca de atender la solicitud del Presidente del Consejo General de Colegios Oficiales de Médicos y materializar alguna medida para frenar la desinformación y las pseudoterapias que constituye una amenaza para la salud pública.', party: 'PP', author: 'Ester Muñoz de la Iglesia, María del Mar Vázquez Jiménez, Elvira Velasco Morillo...' },
+  { text: 'Avances llevados a cabo en el Pla Transformem Rodalíes de Cataluña.', party: 'PSOE', author: 'Ferran Verdejo Vicente' },
+  { text: 'Previsiones del IPCE de alguna actuación de rehabilitación en la Iglesia de San Juan el Real, en el municipio de Calatayud (Zaragoza).', party: 'PSOE', author: 'Víctor Javier Ruiz de Diego, Maribel García López' },
+  { text: 'Número de abortos que se realizan en cada provincia, y de los que se ejercen en centros públicos, así como porcentaje de casos en los que la mujer debe trasladarse a otra provincia o Comunidad Autónoma y medidas previstas para garantizar el derecho a la interrupción voluntaria del embarazo en la sanidad pública y en un centro próximo al domicilio.', party: 'Sumar', author: 'Júlia Boada Danés' },
+  { text: 'Eliminación del programa de verificación de datos de terceros, por parte de plataformas como Meta y X y compromiso con la eficacia de las políticas de protección contra la desinformación europea en España.', party: 'Sumar', author: 'Enrique Fernando Santiago Romero, Francisco Sierra Caballero' },
+  { text: 'Bloqueo de cuentas de asociaciones de mujeres de policías y militares involucrados en el intento de golpe de Estado e identificación de las personas, empresas o entidades donantes.', party: 'Sumar', author: 'Alberto Ibáñez Mezquita' },
+  { text: 'Iniciativas normativas previstas relacionadas con el uso del móvil en los centros escolares.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+  { text: 'Descuentos que se aplican actualmente en los billetes de tren que oferta Renfe.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+];
+
+let currentLevel = null;
+let currentQ = 0;
+let lives = 3;
+let fails = 0;
+let score = 0;
+let answered = false;
+let isCountdown = false;
+let countdownTimer = null;
+let timeLeft = 60;
+let countdownQuestions = [];
+
+const app = document.getElementById('app');
+
+const HEART_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="#01f3b3" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+function render(html) {
+  app.innerHTML = html;
+  app.querySelector('.fade-in')?.offsetHeight;
+}
+
+function goToMenu() {
+  clearCountdown();
+  showMenu();
+}
+
+function clearCountdown() {
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+}
+
+function showMenu() {
+  currentLevel = null;
+  isCountdown = false;
+
+  let cards = LEVELS.map(l =>
+    '<div class="level-card" onclick="startLevel(' + l.id + ')">' +
+      '<div><div class="level-name">' + l.name + '</div></div>' +
+      '<div class="arrow">\u2192</div>' +
+    '</div>'
+  ).join('');
+
+  cards +=
+    '<div class="level-card countdown-card" onclick="startCountdown()">' +
+      '<div>' +
+        '<div class="level-name">\u23F1 Modo Contrarreloj</div>' +
+        '<div class="level-desc">\u00BFCu\u00E1ntas preguntas puedes acertar en un minuto?</div>' +
+      '</div>' +
+      '<div class="arrow">\u2192</div>' +
+    '</div>';
+
+  render('<div class="fade-in"><div class="menu" style="margin-top:24px;">' + cards + '</div></div>');
+}
+
+// --- NORMAL LEVELS ---
+
+function startLevel(id) {
+  isCountdown = false;
+  currentLevel = LEVELS.find(l => l.id === id);
+  currentLevel.questions = shuffle([...currentLevel.questions]);
+  currentQ = 0;
+  lives = 3;
+  score = 0;
+  answered = false;
+  showQuestion();
+}
+
+function showQuestion() {
+  if (lives <= 0) return showResult(false);
+  if (currentQ >= currentLevel.questions.length) return showResult(true);
+
+  answered = false;
+  const q = currentLevel.questions[currentQ];
+  const partyButtons = currentLevel.parties.map(pid => {
+    const p = PARTIES[pid];
+    return '<button class="party-btn" data-party="' + pid + '" onclick="answer(\'' + pid + '\')" style="border-color:' + p.color + '; background:' + p.color + '">' + p.name + '</button>';
+  }).join('');
+
+  render(
+    '<div class="fade-in">' +
+      '<div class="hud">' +
+        '<div class="lives">' + [0,1,2].map(i => '<div class="life ' + (i >= lives ? 'lost' : '') + '">' + HEART_SVG + '</div>').join('') + '</div>' +
+        '<div class="progress-text">' + (currentQ + 1) + ' / ' + currentLevel.questions.length + '</div>' +
+      '</div>' +
+      '<div class="question-box">' +
+        '<span class="quote-open">\u201C</span>' +
+        '<p>' + q.text + '</p>' +
+        '<span class="quote-close">\u201D</span>' +
+      '</div>' +
+      '<div class="options">' + partyButtons + '</div>' +
+      '<div class="feedback" id="feedback"></div>' +
+      '<div class="author-info" id="author-info"></div>' +
+      '<button class="menu-btn" onclick="goToMenu()">\u2190 Men\u00FA</button>' +
+    '</div>'
+  );
+}
+
+function answer(pid) {
+  if (answered) return;
+  answered = true;
+
+  const q = currentLevel.questions[currentQ];
+  const correct = pid === q.party;
+  const buttons = document.querySelectorAll('.party-btn');
+  const fb = document.getElementById('feedback');
+  const authorEl = document.getElementById('author-info');
+
+  buttons.forEach(btn => {
+    const bpid = btn.dataset.party;
+    btn.classList.add('disabled');
+    if (bpid === q.party) btn.classList.add(correct ? 'correct' : 'reveal');
+    if (bpid === pid && !correct) btn.classList.add('wrong');
+  });
+
+  if (correct) {
+    score++;
+    fb.className = 'feedback ok';
+    fb.textContent = '\u2713 \u00A1Correcto!';
+  } else {
+    lives--;
+    document.querySelectorAll('.life').forEach((el, i) => {
+      if (i >= lives) el.classList.add('lost');
+    });
+    fb.className = 'feedback fail';
+    fb.textContent = '\u2717 Era ' + PARTIES[q.party].name;
+  }
+
+  authorEl.textContent = '\u2014 ' + q.author;
+
+  setTimeout(() => { currentQ++; showQuestion(); }, 1800);
+}
+
+function showResult(won) {
+  const emoji = won ? '\uD83C\uDF89' : '\uD83D\uDC80';
+  const title = won ? '\u00A1Nivel superado!' : 'Has perdido';
+  const levelId = currentLevel.id;
+  const msg = won
+    ? 'Has acertado ' + score + ' de ' + currentLevel.questions.length + ' preguntas.'
+    : 'Te has quedado sin vidas. Acertaste ' + score + '.';
+
+  render(
+    '<div class="result fade-in">' +
+      '<div class="emoji">' + emoji + '</div>' +
+      '<h2>' + title + '</h2>' +
+      '<p>' + msg + '</p>' +
+      '<div style="display:flex; gap:1px; justify-content:center;">' +
+        '<button class="menu-btn" style="display:inline-block; margin:0;" onclick="startLevel(' + levelId + ')">🗘 Reintentar</button>' +
+        '<button class="menu-btn" style="display:inline-block; margin:0;" onclick="showMenu()">\u2190 Menú</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+// --- COUNTDOWN MODE ---
+
+function startCountdown() {
+  isCountdown = true;
+  currentLevel = null;
+  countdownQuestions = shuffle([...COUNTDOWN_QUESTIONS]);
+  currentQ = 0;
+  score = 0;
+  fails = 0;
+  answered = false;
+  timeLeft = 60;
+  showCountdownQuestion();
+  clearCountdown();
+  countdownTimer = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearCountdown(); showCountdownResult(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const barInner = document.querySelector('.timer-bar-inner');
+  const timerText = document.querySelector('.timer-text');
+  if (barInner) {
+    barInner.style.width = ((timeLeft / 60) * 100) + '%';
+    barInner.classList.toggle('urgent', timeLeft <= 10);
+  }
+  if (timerText) {
+    timerText.textContent = timeLeft + 's';
+    timerText.classList.toggle('urgent', timeLeft <= 10);
+  }
+}
+
+function showCountdownQuestion() {
+  if (currentQ >= countdownQuestions.length) { clearCountdown(); return showCountdownResult(); }
+
+  answered = false;
+  const q = countdownQuestions[currentQ];
+  const partyButtons = COUNTDOWN_PARTIES.map(pid => {
+    const p = PARTIES[pid];
+    return '<button class="party-btn" data-party="' + pid + '" onclick="answerCountdown(\'' + pid + '\')" style="border-color:' + p.color + '; background:' + p.color + '">' + p.name + '</button>';
+  }).join('');
+
+  const pct = (timeLeft / 60) * 100;
+  const urg = timeLeft <= 10 ? ' urgent' : '';
+
+  render(
+    '<div class="fade-in">' +
+      '<div class="timer-text' + urg + '">' + timeLeft + 's</div>' +
+      '<div class="timer-bar"><div class="timer-bar-inner' + urg + '" style="width:' + pct + '%"></div></div>' +
+      '<div class="hud">' +
+        '<div class="progress-text" style="color:var(--primary); font-size:1.1rem;">\u2713 ' + score + '</div>' +
+        '<div class="progress-text" style="color:#ff4d4d; font-size:1.1rem;">\u2717 ' + fails + '</div>' +
+      '</div>' +
+      '<div class="question-box">' +
+        '<span class="quote-open">\u201C</span>' +
+        '<p>' + q.text + '</p>' +
+        '<span class="quote-close">\u201D</span>' +
+      '</div>' +
+      '<div class="options">' + partyButtons + '</div>' +
+      '<div class="feedback" id="feedback"></div>' +
+      '<div class="author-info" id="author-info"></div>' +
+      '<button class="menu-btn" onclick="goToMenu()">\u2190 Men\u00FA</button>' +
+    '</div>'
+  );
+}
+
+function answerCountdown(pid) {
+  if (answered) return;
+  answered = true;
+
+  const q = countdownQuestions[currentQ];
+  const correct = pid === q.party;
+  const buttons = document.querySelectorAll('.party-btn');
+  const fb = document.getElementById('feedback');
+  const authorEl = document.getElementById('author-info');
+
+  buttons.forEach(btn => {
+    const bpid = btn.dataset.party;
+    btn.classList.add('disabled');
+    if (bpid === q.party) btn.classList.add(correct ? 'correct' : 'reveal');
+    if (bpid === pid && !correct) btn.classList.add('wrong');
+  });
+
+  if (correct) {
+    score++;
+    fb.className = 'feedback ok';
+    fb.textContent = '\u2713 \u00A1Correcto!';
+  } else {
+    fails++;
+    fb.className = 'feedback fail';
+    fb.textContent = '\u2717 Era ' + PARTIES[q.party].name;
+  }
+
+  authorEl.textContent = '\u2014 ' + q.author;
+  const scoreEl = document.querySelector('.progress-text');
+  if (scoreEl) scoreEl.textContent = '\u2713 ' + score;
+  const failEl = document.querySelectorAll('.progress-text')[1];
+  if (failEl) failEl.textContent = '\u2717 ' + fails;
+
+  setTimeout(() => { currentQ++; if (timeLeft > 0) showCountdownQuestion(); }, 1200);
+}
+
+function showCountdownResult() {
+  render(
+    '<div class="result fade-in">' +
+      '<div id="share-card" style="background:#fff; padding:30px 20px; border-radius:3px;">' +
+        '<div class="emoji">\u23F1</div>' +
+        '<h2>\u00A1Tiempo!</h2>' +
+        '<p style="font-size:1.2rem; color:var(--secondary); margin-bottom:6px;">' +
+          '\u2713 <strong>' + score + '</strong> aciertos &nbsp;\u2014&nbsp; \u2717 <strong>' + fails + '</strong> fallos' +
+        '</p>' +
+        '<p style="font-size:1.3rem; color:#bbb; margin-bottom:0;">\u00BFQui\u00E9n ha preguntado al Gobierno en el Congreso por...?</p>' +
+      '</div>' +
+      '<div style="margin-top:24px;">' +
+        '<p style="color:#888; font-size:0.9rem; margin-bottom:12px;">Comparte tu resultado</p>' +
+        '<div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">' +
+          '<button class="btn" onclick="shareImage()" id="btn-share">\uD83D\uDCF7 Compartir imagen</button>' +
+          '<button class="btn" style="background:#25D366;" onclick="shareWhatsApp()">\uD83D\uDCAC WhatsApp</button>' +
+          '<button class="btn" style="background:#1DA1F2; color:#fff;" onclick="shareTwitter()">𝕏 Twitter</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex; gap:12px; justify-content:center; margin-top:20px;">' +
+        '<button class="menu-btn" style="display:inline-block; margin:0;" onclick="startCountdown()">🗘 Reintentar</button>' +
+        '<button class="menu-btn" style="display:inline-block; margin:0;" onclick="showMenu()">\u2190 Menú</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+// --- SHARE FUNCTIONS ---
+
+function getShareText() {
+  return 'Modo Contrarreloj: \u2713 ' + score + ' aciertos / \u2717 ' + fails + ' fallos.' +
+    '\n\u00BFPuedes superarme?' +
+    '\n\u00BFQui\u00E9n ha preguntado al Gobierno en el Congreso por...?' +
+    '\n\nUn juego de Newtral.es: https://newtral-datos.github.io/generador-preguntas-congreso/juego-preguntas.html';
+}
+
+function shareWhatsApp() {
+  const text = 'Modo Contrarreloj: \u2713 ' + score + ' aciertos / \u2717 ' + fails + ' fallos.' +
+    '%0a%0a\u00BFPuedes superarme?' +
+    '%0a\u00BFQui\u00E9n ha preguntado al Gobierno en el Congreso por...?' +
+    '%0a%0aUn juego de Newtral.es: https://newtral-datos.github.io/generador-preguntas-congreso/juego-preguntas.html';
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+
+function shareTwitter() {
+  const text = encodeURIComponent(getShareText());
+  window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
+}
+
+async function shareImage() {
+  const btn = document.getElementById('btn-share');
+  btn.textContent = 'Generando...';
+  btn.disabled = true;
+
+  try {
+    const card = document.getElementById('share-card');
+
+    const watermark = document.createElement('p');
+    watermark.innerHTML = 'Un juego de <b style="color:#01f3b3">Newtral.es</b>';
+    watermark.style.cssText = 'font-size:1.2rem; color:#000; margin-top:14px; margin-bottom:0;';
+    card.appendChild(watermark);
+
+    const canvas = await html2canvas(card, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+    });
+
+    card.removeChild(watermark);
+
+    if (navigator.canShare) {
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'resultado.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              text: getShareText(),
+              files: [file],
+            });
+            btn.textContent = '\uD83D\uDCF7 Compartir imagen';
+            btn.disabled = false;
+            return;
+          } catch (e) {}
+        }
+        downloadCanvas(canvas);
+        btn.textContent = '\u2713 Imagen descargada';
+        btn.disabled = false;
+        setTimeout(() => { btn.textContent = '\uD83D\uDCF7 Compartir imagen'; }, 2000);
+      }, 'image/png');
+    } else {
+      downloadCanvas(canvas);
+      btn.textContent = '\u2713 Imagen descargada';
+      btn.disabled = false;
+      setTimeout(() => { btn.textContent = '\uD83D\uDCF7 Compartir imagen'; }, 2000);
+    }
+  } catch (e) {
+    btn.textContent = '\uD83D\uDCF7 Compartir imagen';
+    btn.disabled = false;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(getShareText());
+      btn.textContent = '\u2713 Texto copiado';
+      setTimeout(() => { btn.textContent = '\uD83D\uDCF7 Compartir imagen'; }, 2000);
+    }
+  }
+}
+
+
+function downloadCanvas(canvas) {
+  const link = document.createElement('a');
+  link.download = 'resultado-quien-lo-dijo.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+showMenu();
+</script>
+</body>
+</html>

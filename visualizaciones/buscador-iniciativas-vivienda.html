@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Buscador de iniciativas parlamentarias</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .wrap { padding: 1.5rem 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .header { margin-bottom: 1.25rem; }
+  .header h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .header p { font-size: 13px; color: var(--color-text-secondary); }
+  .search-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
+  label { font-size: 12px; color: var(--color-text-secondary); display: block; margin-bottom: 4px; }
+  .search-bar select {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 38px; padding: 0 12px;
+    border: 1.5px solid #01f3b3; border-radius: 3px;
+    background: var(--color-background-primary);
+    color: var(--color-text-primary); font-size: 14px; outline: none;
+  }
+  .search-bar select:focus { border-color: #00c994; }
+  .btn-buscar {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 38px; padding: 0 22px; background: #01f3b3;
+    border: none; border-radius: 3px; font-size: 14px;
+    font-weight: 500; color: #04342C; cursor: pointer;
+  }
+  .btn-buscar:hover { background: #00dba0; }
+  .btn-limpiar {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 38px; padding: 0 16px; background: transparent;
+    border: 1.5px solid #01f3b3; border-radius: 3px; font-size: 14px;
+    color: var(--color-text-secondary); cursor: pointer;
+  }
+  .btn-limpiar:hover { background: var(--color-background-secondary); }
+  .results-count { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+  .card {
+    border: 1.5px solid #01f3b3; border-radius: 3px;
+    background: var(--color-background-primary);
+    padding: 1rem 1.25rem; margin-bottom: 12px;
+  }
+  .card-keyword {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    background: #01f3b3; color: #04342C; border-radius: 3px;
+    padding: 2px 8px; margin-bottom: 8px; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); line-height: 1.5; margin-bottom: 10px; }
+  .card-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+  
+  /* --- Estilos base del Badge de Autor --- */
+  .badge-autor {
+    font-size: 12px; font-weight: 500; padding: 3px 10px;
+    border: 1.5px solid #494949; border-radius: 3px; color: #494949;
+  }
+  
+  /* --- Colores específicos por Partido Político --- */
+  .badge-autor.psoe { color: #f31912; background: #f3191228; border-color: #f31912; }
+  .badge-autor.pp { color: #1e4a90; background: #1e4a903d; border-color: #1e4a90; }
+  .badge-autor.vox { color: #66bc29; background: #66bc293b; border-color: #66bc29; }
+  .badge-autor.sumar { color: #e51c55; background: #e51c553b; border-color: #e51c55; }
+  .badge-autor.erc { color: #b37400; background: #b3740048; border-color: #FFB232; }
+  .badge-autor.eh-bildu { color: #00876f; background: #00876e57; border-color: #00c19f; }
+  .badge-autor.pnv { color: #357528; background: #35752822; border-color: #499e37; }
+  .badge-autor.jxcat { color: #008a7e; background: #008a7e22; border-color: #00c3b2; }
+  .badge-autor.podemos { color: #693bd1; background: #683bd133; border-color: #9169f4; }
+  .badge-autor.upn { color: #1e4a90; background: #1e4a903d; border-color: #1e4a90; }
+  .badge-autor.bng { color: #2374b5; background: #2373b550; border-color: #6aade4; }
+  .badge-autor.mes-compromis { color: #b05311; background: #b0531146; border-color: #e67727; }
+  .badge-autor.cca { color: #aa8400; background: #aa850034; border-color: #ffcb05; }
+  .badge-autor.senado-psoe { color: #f31912; background: #f3191228; border-color: #f31912; }
+  .badge-autor.senado-izquierdas { color: #00876f; background: #00876e57; border-color: #00c19f; }
+
+  .badge-estado {
+    font-size: 12px; padding: 3px 10px; border-radius: 3px; font-weight: 400;
+    border: 1px solid var(--color-border-tertiary);
+    color: var(--color-text-secondary); background: var(--color-background-secondary);
+  }
+  .badge-estado.retirado { border-color: #F0997B; color: #993C1D; background: #FAECE7; }
+  .badge-estado.rechazado { border-color: #F09595; color: #A32D2D; background: #FCEBEB; }
+  .badge-estado.aprobado { border-color: #97C459; color: #3B6D11; background: #EAF3DE; }
+  .card-link a {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px; color: #0F6E56; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    border-bottom: 1px solid #01f3b3; padding-bottom: 1px;
+  }
+  .card-link a:hover { color: #04342C; }
+  .empty { text-align: center; padding: 2.5rem 1rem; color: var(--color-text-secondary); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h2 class="sr-only">Buscador de iniciativas parlamentarias</h2>
+  <div class="header">
+    <h2>Buscador de iniciativas</h2>
+    <p>Filtra por tipo de iniciativa, palabra clave y autor</p>
+  </div>
+
+  <div class="search-bar">
+    <div class="field">
+      <label for="inp-tipo-iniciativa">Tipo de iniciativa</label>
+      <select id="inp-tipo-iniciativa">
+        <option value="" selected>Iniciativas</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="inp-keyword">Palabra clave</label>
+      <select id="inp-keyword">
+        <option value="" selected>Palabras</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="inp-autor">Autor</label>
+      <select id="inp-autor">
+        <option value="" selected>Autores</option>
+      </select>
+    </div>
+    <div class="field" style="flex:0; justify-content:flex-end; flex-direction:row; align-items:flex-end; gap:8px;">
+      <button class="btn-limpiar" onclick="limpiar()">Limpiar</button>
+      <button class="btn-buscar" onclick="buscar()">Buscar</button>
+    </div>
+  </div>
+
+  <div id="results-count" class="results-count"></div>
+  <div id="results"></div>
+</div>
+
+<script>
+const DATA = [
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley de reducción temporal del diferencial aplicable en las hipotecas a tipo variable de la Vivienda habitual en situaciones de vulnerabilidad económica.",
+    autor: "Grupo Mixto",
+    estado: "Retirado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000031"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley de modification de la Ley 7/1985, de 2 de abril, Reguladora de las Bases del Régimen Local, con el fin de modificar el padrón municipal en los casos de Ocupación y de inmigración ilegal.",
+    autor: "Vox",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000039"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley de reducción temporal del diferencial aplicable en las hipotecas a tipo variable de la Vivienda habitual en situaciones de vulnerabilidad económica.",
+    autor: "Grupo Mixto",
+    estado: "Pleno Toma en consideración",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000042"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley de prevención de la especulación y garantías de la Vivienda como bien social.",
+    autor: "Grupo Mixto",
+    estado: "Pleno Toma en consideración",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000102"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley relativa a la regulación de los contratos de Alquiler de Vivienda por temporada y Alquiler de habitaciones.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000119"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley para la regulación de los contratos de Alquiler temporales y Alquiler de habitaciones.",
+    autor: "ERC / Grupo Mixto / Bildu / Sumar",
+    estado: "Comisión de Vivienda y Agenda Urbana Dictamen",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000136"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley de modificación de la Ley 19/1994, de 6 de julio, de modificación del Régimen Económico y Fiscal de Canarias, para la regulación de las inversiones en elementos patrimoniales afectos a la actividad de arrendamiento de Vivienda en las Islas Canarias.",
+    autor: "PSOE / Grupo Mixto",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000146"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley Orgánica de medidas urgentes para hacer frente a la Ocupación ilegal de inmuebles.",
+    autor: "Junts",
+    estado: "Comisión de Justicia Enmiendas",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000150"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley para la modificación de la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000178"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley para impulsar el Alquiler de Viviendas a precios asequibles.",
+    autor: "PSOE",
+    estado: "Pleno Toma en consideración",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000196"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley sobre el cumplimiento de las obligaciones internacionales de no reconocimiento y no asistencia a situaciones de Ocupación ilegal de territorios.",
+    autor: "Sumar",
+    estado: "Pleno Toma en consideración",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000199"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley para la modificación de la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda.",
+    autor: "Sumar",
+    estado: "Retirado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000250"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley para la modificación de la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda.",
+    autor: "Sumar",
+    estado: "Pleno Toma en consideración",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000251"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley de medidas administrativas y procesales para la seguridad jurídica de la ordenación territorial y urbanística, el impulso del desarrollo urbano y la Vivienda.",
+    autor: "PP",
+    estado: "Comisión de Vivienda y Agenda Urbana Enmiendas",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000253"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley Orgánica contra la Ocupación ilegal de inmuebles y para la convivencia vecinal y la protección de la seguridad de las personas y cosas en las comunidades de propietarios.",
+    autor: "PP",
+    estado: "Pleno Toma en consideración",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000254"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley de Grupos Parlamentarios del Congreso",
+    titulo: "Proposición de Ley para una reforma del IBI que lo haga más justo y favorecedor del derecho a la Vivienda.",
+    autor: "Sumar",
+    estado: "Gobierno Contestación",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=122%2F000278"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición de ley del Senado",
+    titulo: "Proposición de Ley Orgánica contra la Ocupación ilegal y para la convivencia vecinal y la protección de la seguridad de las personas y cosas en las comunidades de propietarios.",
+    autor: "Senado",
+    estado: "Comisión de Justicia Enmiendas",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=124%2F000003"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición de ley del Senado",
+    titulo: "Proposición de Ley de medidas administrativas y procesales para la seguridad jurídica de la ordenación territorial y urbanística, el impulso de desarrollo urbano y la Vivienda.",
+    autor: "Senado",
+    estado: "Comisión de Vivienda y Agenda Urbana Enmiendas",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=124%2F000020"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para recuperar la deducción por Vivienda habitual en el Impuesto sobre la Renta de las Personas Físicas y extender a toda la Nación la deducción por los costes de Alquiler.",
+    autor: "Vox",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000127"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la situación de la Vivienda vacacional en Canarias.",
+    autor: "Sumar",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000236"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre creación de un registro que recoja la información sobre el parque de Vivienda del que disponen los propietarios considerados como grandes tenedores, según la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda, y que se encuentran en zonas de mercado residencial tensionado.",
+    autor: "PSOE",
+    estado: "Retirado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000261"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para facilitar el acceso a la adquisición de la primera Vivienda.",
+    autor: "Vox",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000277"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre creación de un registro que recoja la información sobre el parque de Vivienda del que disponen los propietarios considerados como grandes tenedores, según la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda, y que se encuentran en zonas de mercado residencial tensionado.",
+    autor: "PSOE",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000279"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para abordar el reto del acceso a la Vivienda de los jóvenes en España.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000292"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para promover y facilitar el acceso a la primera Vivienda.",
+    autor: "Vox",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000303"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para la reforma de la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda, para evitar que vulnere competencias exclusivas de las Comunidades Autónomas.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000307"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para abordar el reto del acceso a la Vivienda de los jóvenes en España.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000368"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la construcción de Vivienda social y protegida en España.",
+    autor: "Vox",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000394"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para consolidar el Bono Alquiler Joven.",
+    autor: "PSOE",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000411"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la construcción de Viviendas en Alquiler social.",
+    autor: "PSOE",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000412"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para frenar la especulación inmobiliaria y garantizar el acceso a una Vivienda digna.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000414"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la declaración de zonas de mercado residencial tensionado y aplicación del índice de precios de referencia para el mercado del Alquiler.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000415"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para impulsar un Pacto de Estado por la Vivienda.",
+    autor: "PP",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000530"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para la eliminación de trabas burocráticas en la construcción de Vivienda.",
+    autor: "PP",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000572"
+  },
+  {
+    palabra: "Okupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a garantizar la seguridad de la ciudadanía, en general, y de las Fuerzas y Cuerpos de Seguridad del Estado, en particular, incrementando los medios personales y materiales de la Guardia Civil en las zonas rurales y territorios más dispersos, prestando especial atención a aquellas comarcas con riesgo de despoblación y/o zonas afectadas por la Okupación ilegal de Viviendas.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000599"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la reforma de la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000677"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre medidas de impulso de la construcción industrializada y prefabricada de Vivienda.",
+    autor: "PP",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000924"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a favorecer los convenios entre las Administraciones públicas y en especial los ayuntamientos y los colegios de arquitectos para potenciar y agilizar la promoción de Vivienda pública.",
+    autor: "PSOE",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000941"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre adopción de medidas urgentes para declaración de zonas de mercado residencial tensionado y aplicación del Índice de Precios de Referencia, tras el refrendo del Tribunal Constitucional del contenido, entre otros, del artículo 18 de la Ley de Vivienda.",
+    autor: "PSOE",
+    estado: "Retirado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000962"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la elaboración de un Plan de análisis del mercado laboral, formación y recualificación de la población activa orientada a la cobertura de puestos de difícil Ocupación.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F000981"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre reconocimiento europeo de la Vivienda y del hecho insular.",
+    autor: "Sumar",
+    estado: "Comisión Mixta sobre Insularidad Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001013"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley (moción) por la que se insta a las administraciones competentes a declarar las correspondientes zonas de mercado residencial tensionado en las Illes Balears y la consiguiente aplicación del Índice de Precios de Referencia para el mercado del Alquiler.",
+    autor: "Senado-PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001069"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la lucha contra la Ocupación ilegal.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001143"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a abaratar el acceso a la Vivienda.",
+    autor: "Vox",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001165"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre el impulso de reformas legislativas que favorezcan el acceso a la Vivienda en España.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001208"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre los problemas de seguridad que conlleva el fenómeno creciente de la Ocupación ilegal de Viviendas.",
+    autor: "Grupo Mixto",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001210"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa al impulso de políticas que favorezcan el acceso de los y las jóvenes a la Vivienda.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001222"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la revisión y readecuación de la normativa derivada del Real Decreto 933/2021, de 26 de octubre, por el que se establecen las obligaciones de registro documental e información de las personas físicas o jurídicas que ejercen actividades de hospedaje y Alquiler de vehículos a motor, mediante un proceso de diálogo y consenso previo con el sector turístico español.",
+    autor: "PP",
+    estado: "Comisión de Industria y Turismo Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001285"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la protección de la infancia en las políticas de Vivienda.",
+    autor: "PSOE",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001288"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre fiscalidad de las ayudas a la rehabilitación de la Vivienda.",
+    autor: "Sumar",
+    estado: "Comisión de Hacienda y Función Pública Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001296"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para instar la rectificación de las declaraciones de la Ministra de Vivienda y Agenda Urbana y abordar con consenso el nuevo Plan Estatal de Vivienda.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001306"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a garantizar el parque público de Vivienda protegida.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001322"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a establecer los procedimientos de intermediación y conciliación por las administraciones competentes en materia de Vivienda.",
+    autor: "PSOE",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001352"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la adopción de medidas normativas para el desarrollo de una hipoteca a tipo fijo regulada para la adquisición de Vivienda habitual.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001366"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para la modificación de los condicionantes, así como del importe de las ayudas del bono Alquiler joven.",
+    autor: "Junts",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001497"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para garantizar el derecho a la Vivienda y prevenir la especulación.",
+    autor: "ERC",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001523"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a destinar a Vivienda social el Patrimonio Sindical Acumulado.",
+    autor: "Vox",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001528"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para frenar la venta de la inmobiliaria Árqura Homes y redefinir el objeto social de la SAREB hacia la promoción de Vivienda pública y asequible.",
+    autor: "Sumar",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001535"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa al impulso del plan europeo de Vivienda.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001539"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para la creación de un parque público de Vivienda de Alquiler social permanente en la Operación Campamento.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001557"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para la cesión de uso del antiguo cuartel de la Guardia Civil de Sant Vicenç dels Horts para Vivienda pública de Alquiler protegido.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001621"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la baja ejecución del presupuesto del Ministerio de Vivienda y Agenda Urbana.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001624"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a favorecer la Vivienda cooperativa en cesión de uso para seguir favoreciendo el acceso a la Vivienda.",
+    autor: "PSOE",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001629"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la lucha contra la Ocupación ilegal y la inquiOcupación de Viviendas.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001696"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre el desarrollo urgente de medidas para facilitar el acceso a la Vivienda.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001698"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre el diseño del Plan Estatal de Vivienda 2026-2029.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001702"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a apoyar los trabajos en el seno de la Unión Europea para abordar la crisis de la Vivienda.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001706"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley por una segunda descentralización del Estado para garantizar el derecho a la Vivienda.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001722"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley (moción) por la que se insta al Gobierno al impulso de la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda, en los territorios insulares.",
+    autor: "Senado-PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001796"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la puesta en marcha de un Programa Integral de Vivienda Rural y Reto Demográfico.",
+    autor: "Sumar",
+    estado: "Comisión de Transición Ecológica y Reto Demográfico Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001801"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la puesta en marcha de un Programa Integral de Vivienda Rural y Reto Demográfico.",
+    autor: "Sumar",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001802"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la necesaria aplicación de la Ley por el derecho a la Vivienda en lo referido a la declaración de zonas de mercado residencial tensionado, dando cumplimiento a lo recogido en su artículo 18.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001927"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la elaboración de un informe estatal sobre el impacto de la inmigración en la Vivienda.",
+    autor: "Vox",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001948"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para acabar con todas las formas de Ocupación ilegal de Vivienda.",
+    autor: "Vox",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001949"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para poner fin al intervencionismo del Gobierno en el mercado de la Vivienda.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001969"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para la agilización de trámites y la simplificación burocrática en materia urbanística con el fin de aumentar la oferta de Vivienda.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001970"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa al Parque de Vivienda Pública.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F001997"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para aclarar, flexibilizar y garantizar las conditions de la financiación propuesta para las Viviendas de Alquiler social en Xuxán (A Coruña).",
+    autor: "PP",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002099"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para la cesión del suelo de la Sareb al patrimonio de suelo y Vivienda del Estado o a las Comunidades Autónomas que así lo soliciten.",
+    autor: "Sumar",
+    estado: "Comisión de Economía, Comercio y Transformación Digital Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002102"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a desplegar todos los recursos disponibles para garantizar el acceso a la Vivienda.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002116"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a favorecer la incorporación de la mujer al sector de la construcción y la edificación, aprovechando el desarrollo del recién presentado PERTE (Proyecto Estratégico para la Recuperación y Transformación Económica) en materia de Vivienda.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002117"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre los incumplimientos parlamentarios del Gobierno en materia de Vivienda.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002128"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para poner en marcha un plan urgente que facilite el acceso de los jóvenes a la Vivienda en España.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002130"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la derogación de la Ley por el derecho a la Vivienda y a la elaboración de una nueva norma basada en el consenso, la seguridad jurídica y el aumento real de la oferta de Vivienda.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002133"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para potenciar la movilidad con vehículos de alta Ocupación.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002161"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la transparencia del Alquiler de Viviendas.",
+    autor: "Sumar",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002173"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para limitar las plazas de Alquiler turístico en las Illes Balears.",
+    autor: "Sumar",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002229"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la exigencia urgente de simplificación y desarrollo de una regulación normativa equilibrada y eficiente del Real Decreto 933/2021, de 26 de octubre, por el que se establecen las obligaciones de registro documental e información de las personas físicas o jurídicas que ejercen actividades de hospedaje y Alquiler de vehículos a motor.",
+    autor: "PP",
+    estado: "Comisión de Industria y Turismo Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002292"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la adopción de medidas urgentes para desbloquear suelo y aumentar la producción de Vivienda asequible en España.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002404"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para recuperar la Vivienda como un derecho frente a la especulación.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002439"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para reformar la política de Vivienda y garantizar el acceso de los jóvenes.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002450"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley (moción) relativa a la aplicación del Índice de Precios de Referencia para disminuir los precios del Alquiler en las Illes Balears.",
+    autor: "Senado-PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002472"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre el impulso de un plan europeo sobre Vivienda.",
+    autor: "PSOE",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002480"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa al derecho de retracto en la cesión de créditos hipotecarios destinados a la adquisición de Vivienda habitual a terceras personas o entidades.",
+    autor: "Grupo Mixto",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002481"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a limitar el Alquiler de habitaciones de uso turístico por las comunidades de propietarios.",
+    autor: "PSOE",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002488"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para conocer, y solucionar de manera urgente, la problemática de la Ocupación e inquiOcupación en España.",
+    autor: "Vox",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002515"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la garantía del derecho a la Vivienda en España.",
+    autor: "Grupo Mixto",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002568"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la comparecencia trimestral de la Ministra de Vivienda y Agenda Urbana.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002577"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a una bajada drástica de los impuestos relacionados con la Vivienda.",
+    autor: "Vox",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002596"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre el problema de la Vivienda, un compromiso de todos.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002614"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la protección del acceso a la Vivienda para los jóvenes y las familias españolas frente a la especulación y la compra masiva por parte de fondos y fortunas extranjeras.",
+    autor: "Vox",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002674"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la adopción de medidas urgentes contra la Ocupación ilegal de Viviendas.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002679"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre el Plan Estatal de Vivienda 2026-2030 impuesto y diseñado contra las Comunidades Autónomas.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002680"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa al 50 aniversario de la Ocupación del Sahara Occidental.",
+    autor: "Sumar",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002681"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley (moción) relativa a la Vivienda industrializada.",
+    autor: "Senado-PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002721"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para establecer contratos de Alquiler de Vivienda indefinidos.",
+    autor: "Grupo Mixto",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002855"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley contra el fraude fiscal en las rentas inmobiliarias y en favor de un modelo de Vivienda accesible.",
+    autor: "Sumar",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F002966"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la utilización del superávit presupuestario de las entidades locales para realizar Inversiones Financieramente Sostenibles en políticas de Vivienda e inversiones productivas.",
+    autor: "PP",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003008"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para implementar medidas que favorezcan la Vivienda rural en los municipios con riesgo de despoblación.",
+    autor: "PP",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003020"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la cesión del denominado Centro de Especialidades de Burgos al Excmo. Ayuntamiento de Burgos para que éste desarrolle un proyecto de Vivienda protegida dirigida a jóvenes.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003021"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la adecuación de la planificación eléctrica para garantizar el desarrollo de Vivienda.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003023"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre medidas que agilicen la construcción de Vivienda.",
+    autor: "PP",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003037"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la situación que atraviesa la Vivienda en España en el contexto europeo.",
+    autor: "PP",
+    estado: "Aprobado sin modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003040"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre la adopción de medidas urgentes para evitar el desahucio de 62 familias en Manilva (Málaga), la expropiación del inmueble y su incorporación a la entidad estatal de Vivienda 'Casa 47'.",
+    autor: "Grupo Mixto",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003107"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley sobre perspectiva de infancia en el Plan Estatal de Vivienda 2026-2030.",
+    autor: "PSOE",
+    estado: "Comisión de Juventud e Infancia Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003110"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a continuar apoyando y fomentando la colaboración entre administraciones para seguir garantizando el derecho a una Vivienda digna.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003115"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la cesión de las Viviendas propiedad de ADIF en Ribadavia para ser destinadas a Alquiler social.",
+    autor: "Grupo Mixto",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003117"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para implementar medidas que favorezcan la Vivienda rural en los municipios con riesgo de despoblación.",
+    autor: "PP",
+    estado: "Comisión de Transición Ecológica y Reto Demográfico Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003157"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa al impulso y reconocimiento de las políticas de Vivienda dirigidas a la juventud en España.",
+    autor: "PSOE",
+    estado: "Comisión de Juventud e Infancia Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003195"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la consolidación de políticas públicas en favor de la Vivienda social.",
+    autor: "PSOE",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003202"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a continuar apostando por el diálogo y la colaboración con todas las administraciones y el sector privado para reforzar el parque público de Vivienda.",
+    autor: "PSOE",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003203"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley (moción) relativa a la garantía del uso residencial de la Vivienda y a la adopción de medidas contra la especulación inmobiliaria en territorios insulares.",
+    autor: "Senado-Grupo Parlamentario Izquierdas por la Independencia (Esquerra Republicana-Euskal Herria Bildu)",
+    estado: "Comisión Mixta sobre Insularidad Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003208"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa al refuerzo de los mecanismos de cooperación interadministrativa en materia de Vivienda y políticas urbanas.",
+    autor: "PSOE",
+    estado: "Comisión de Política Territorial Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003210"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la promoción de medidas para proteger el acceso de los españoles a la Vivienda ante el impacto de la crisis energética, la subida de tipos de interés y la presión de la demanda extranjera.",
+    autor: "Vox",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003240"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la movilización del suelo y patrimonio público infrautilizado para su destino prioritario a políticas de Vivienda asequible.",
+    autor: "PSOE",
+    estado: "Comisión de Política Territorial Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003298"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para el impulso de medidas realmente efectivas para el acceso de los jóvenes a la Vivienda.",
+    autor: "PP",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003300"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para que el Gobierno cumpla los mandatos del Parlamento en materia de Vivienda.",
+    autor: "PP",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003301"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la protección de los inquilinos y a la recuperación de Viviendas en manos de fondos de Inversión para su reincorporación al parque público de Vivienda.",
+    autor: "Sumar",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003337"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a medidas para incrementar la oferta de Vivienda.",
+    autor: "PP",
+    estado: "Comisión Mixta para Coordinación y Seguimiento Estrategia Española ODS Publicación",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003341"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley para poner límite a la acumulación especulativa de la Vivienda y garantizar su función social.",
+    autor: "Grupo Mixto",
+    estado: "Comisión de Vivienda y Agenda Urbana Mesa - Acuerdo",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003346"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley en Comisión",
+    titulo: "Proposición no de Ley relativa a la creación de una Hucha Hogar Joven como instrumento de apoyo al ahorro finalista para la adquisición de Vivienda habitual.",
+    autor: "PP",
+    estado: "Comisión de Juventud e Infancia Votación",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=161%2F003348"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley para recuperar la deducción por Vivienda habitual en el Impuesto sobre la Renta de las Personas Físicas y extender a toda la Nación la deducción por los costes de Alquiler.",
+    autor: "Vox",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000052"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley para promover y facilitar el acceso a la primera Vivienda.",
+    autor: "Vox",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000139"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a la construcción de Vivienda social y protegida en España.",
+    autor: "Vox",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000148"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley para impulsar un Pacto de Estado por la Vivienda.",
+    autor: "PP",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000150"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley sobre medidas de impulso a la Vivienda habitual.",
+    autor: "PP",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000154"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a las medidas para asegurar el derecho efectivo a la Vivienda.",
+    autor: "Bildu",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000167"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a la reforma de la Ley 12/2023, de 24 de mayo, por el derecho a la Vivienda.",
+    autor: "Sumar",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000211"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa al abordaje del reto del acceso a la Vivienda de los jóvenes en España.",
+    autor: "PP",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000264"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a abaratar el acceso a la Vivienda.",
+    autor: "Vox",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000303"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a la revisión y readecuación de la normativa derivada del Real Decreto 933/2021, de 26 de octubre, por el que se establecen las obligaciones de registro documental e información de las personas físicas o jurídicas que ejercen actividades de hospedaje y Alquiler de vehículos a motor, mediante un proceso de diálogo y consenso previo con el sector turístico español.",
+    autor: "PP",
+    estado: "Aprobado con modificaciones",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000329"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a garantizar el parque público de Vivienda protegida.",
+    autor: "PSOE",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000330"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley sobre la protección de la Vivienda pública.",
+    autor: "Sumar",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000336"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley para la creación de un parque público de Vivienda de Alquiler social permanente en la Operación Campamento.",
+    autor: "Sumar",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000343"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a destinar a Vivienda social el Patrimonio Sindical Acumulado.",
+    autor: "Vox",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000377"
+  },
+  {
+    palabra: "Alquiler",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a la necesidad urgente de revertir la aplicación vigente del Real Decreto 933/2021, de 26 de octubre, por el que se establecen las obligaciones de registro documental e información de las personas físicas o jurídicas que ejercen actividades de hospedaje y Alquiler de vehículos a motor en todos los destinos.",
+    autor: "PP",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000397"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa al secuestro del Dr. Hussam Abu Sayifa, entre otros médicos y pacientes del Hospital Kamal Adwan en Gaza, por parte de las fuerzas de Ocupación israelíes.",
+    autor: "Grupo Mixto",
+    estado: "Retirado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000401"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley de medidas urgentes en materia de Vivienda en las Illes Balears.",
+    autor: "Grupo Mixto",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000441"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley para acabar con todas las formas de Ocupación ilegal de Vivienda.",
+    autor: "Vox",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000468"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley para frenar la especulación inmobiliaria y garantizar el acceso a una Vivienda digna.",
+    autor: "Sumar",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000498"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a impulsar medidas favorecedoras del modelo de Vivienda cooperativa en cesión de uso.",
+    autor: "Sumar",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000523"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley de medidas urgentes para garantizar el derecho a la Vivienda frente a actuaciones especulativas de la Sareb y sus entidades gestoras.",
+    autor: "Grupo Mixto",
+    estado: "Retirado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000537"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley de medidas urgentes para garantizar el derecho a la Vivienda frente a actuaciones especulativas de la Sareb y sus entidades gestoras.",
+    autor: "Grupo Mixto",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000538"
+  },
+  {
+    palabra: "Ocupación",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley sobre la rescisión de las relaciones contractuales en empresas que colaboren con la Ocupación y el genocidio que perpetra Israel en Palestina.",
+    autor: "Grupo Mixto",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000551"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley de medidas fiscales, regulatorias y de adquisición pública para asegurar el derecho a la Vivienda.",
+    autor: "ERC",
+    estado: "Rechazado",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000580"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa a una bajada drástica de los impuestos relacionados con la Vivienda.",
+    autor: "Vox",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000609"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley para establecer contratos de Alquiler de Vivienda indefinidos.",
+    autor: "Grupo Mixto",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000664"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley sobre medidas para que acceder a una Vivienda deje de ser misión imposible.",
+    autor: "PP",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000681"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley sobre la adopción de medidas urgentes para evitar el desahucio de 62 familias en Manilva (Málaga), la expropiación del inmueble and su incorporación a la entidad estatal de Vivienda 'Casa 47'.",
+    autor: "Grupo Mixto",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000715"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley sobre la adecuación de la planificación eléctrica para garantizar el desarrollo de Vivienda.",
+    autor: "PP",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000731"
+  },
+  {
+    palabra: "Vivienda",
+    tipo: "Proposición no de Ley ante el Pleno",
+    titulo: "Proposición no de Ley relativa al parque público de Vivienda y al refuerzo de la transparencia y los mecanismos de control en los procesos de adjudicación de Vivienda protegida.",
+    autor: "PSOE",
+    estado: "Pleno",
+    enlace: "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id=162%2F000770"
+  }
+];
+
+function estadoClass(e) {
+  const s = e.toLowerCase();
+  if (s.includes("retir")) return "retirado";
+  if (s.includes("rechaz")) return "rechazado";
+  if (s.includes("aprobad")) return "aprobado";
+  if (s.includes("pleno") || s.includes("toma")) return "pleno";
+  return "";
+}
+
+function autorClass(a) {
+  const s = a.toLowerCase().trim();
+  if (s === "psoe") return "psoe";
+  if (s === "pp") return "pp";
+  if (s === "vox") return "vox";
+  if (s === "sumar") return "sumar";
+  if (s === "erc") return "erc";
+  if (s.includes("bildu")) return "eh-bildu";
+  if (s === "pnv") return "pnv";
+  if (s.includes("jxcat") || s.includes("junts")) return "jxcat";
+  if (s === "podemos") return "podemos";
+  if (s === "upn") return "upn";
+  if (s === "bng") return "bng";
+  if (s.includes("compromís") || s.includes("compromis")) return "mes-compromis";
+  if (s.includes("cca")) return "cca";
+  if (s === "senado-psoe") return "senado-psoe";
+  if (s.includes("izquierdas por la independencia")) return "senado-izquierdas";
+  return ""; 
+}
+
+function poblarDesplegables() {
+  const palabras = [...new Set(DATA.map(d => d.palabra).filter(Boolean))].sort();
+  const tipos = [...new Set(DATA.map(d => d.tipo).filter(Boolean))].sort();
+  const autores = [...new Set(DATA.map(d => d.autor).filter(Boolean))].sort();
+  
+  const selKw = document.getElementById('inp-keyword');
+  const selTipo = document.getElementById('inp-tipo-iniciativa');
+  const selAut = document.getElementById('inp-autor');
+  
+  palabras.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; selKw.appendChild(o); });
+  tipos.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; selTipo.appendChild(o); });
+  autores.forEach(a => { const o = document.createElement('option'); o.value = a; o.textContent = a; selAut.appendChild(o); });
+}
+
+function renderCards(items) {
+  const cont = document.getElementById('results');
+  const count = document.getElementById('results-count');
+  if (!items.length) {
+    cont.innerHTML = '<div class="empty"><i class="ti ti-search" style="font-size:28px;display:block;margin-bottom:8px;opacity:0.3" aria-hidden="true"></i>No se encontraron iniciativas con esos filtros.</div>';
+    count.textContent = '';
+    return;
+  }
+  count.textContent = items.length === 1 ? '1 resultado' : items.length + ' resultados';
+  cont.innerHTML = items.map(d => `
+    <div class="card">
+      <span class="card-keyword">${d.palabra}</span>
+      <p class="card-title">${d.titulo}</p>
+      <div class="card-meta">
+        <span class="badge-autor ${autorClass(d.autor)}"><i class="ti ti-user" style="font-size:13px;vertical-align:-1px;margin-right:4px" aria-hidden="true"></i>${d.autor}</span>
+        <span class="badge-estado ${estadoClass(d.estado)}"><i class="ti ti-circle-check" style="font-size:13px;vertical-align:-1px;margin-right:4px" aria-hidden="true"></i>Estado: ${d.estado}</span>
+      </div>
+      <div style="font-size:12px; margin-bottom:10px; color:var(--color-text-secondary)"><strong>Tipo:</strong> ${d.tipo}</div>
+      <div class="card-link">
+        <a href="${d.enlace}" target="_blank" rel="noopener">
+          <i class="ti ti-external-link" style="font-size:13px" aria-hidden="true"></i>
+          Ver iniciativa en el Congreso
+        </a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function buscar() {
+  const kw = document.getElementById('inp-keyword').value;
+  const tipo = document.getElementById('inp-tipo-iniciativa').value;
+  const autor = document.getElementById('inp-autor').value;
+  
+  const res = DATA.filter(d => {
+    const matchKw = !kw || d.palabra.toLowerCase() === kw.toLowerCase();
+    const matchTipo = !tipo || d.tipo.toLowerCase() === tipo.toLowerCase();
+    const matchAutor = !autor || d.autor.toLowerCase() === autor.toLowerCase();
+    return matchKw && matchTipo && matchAutor;
+  });
+  renderCards(res);
+}
+
+function limpiar() {
+  document.getElementById('inp-keyword').selectedIndex = 0;
+  document.getElementById('inp-tipo-iniciativa').selectedIndex = 0;
+  document.getElementById('inp-autor').selectedIndex = 0;
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('results-count').textContent = '';
+}
+
+poblarDesplegables();
+</script>
+
+</body>
+</html>
