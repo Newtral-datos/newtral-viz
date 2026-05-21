@@ -69,7 +69,6 @@ const LEVELS = [
       { text: 'Número de personas que consumen cocaína en España, así como programas que está elaborando el Gobierno para abordar las adicciones en la población española.', party: 'Vox', author: 'Tomás Fernández Ríos, Francisco José Alcaraz Martos' },
       { text: 'Actividades programadas que promuevan y difundan la tauromaquia en el extranjero para el año 2024.', party: 'Vox', author: 'Joaquín Robles López, Blanca Armario González, José Ramírez del Río' },
       { text: 'Estimación de gasto público total para la organización del Mundial de Fútbol del año 2030, así como sobre el número de partidos que se disputarán en España, Portugal y Marruecos, respectivamente.', party: 'Vox', author: 'José Ramírez del Río, Jacobo González-Robatto Perote, Joaquín Robles López' },
-      { text: 'Previsiones acerca de dar marcha atrás a la decisión de prohibir la caza en los parques nacionales para favorecer una gestión controlada de los ungulados, así como población de linces ibéricos y águilas reales en Monfragüe y Cabañeros antes y después de la prohibición e informes desarrollados para plantear la introducción de lobos en dichos parques nacionales.', party: 'Vox', author: 'José María Figaredo Álvarez-Sala, Ángel López Maraver, Patricia Rueda Perelló...' },
       { text: 'Opinión del Gobierno sobre si el sistema político impuesto en Rusia a partir del golpe de Estado de noviembre de 1917 fue una dictadura, así como actuaciones previstas en relación con la Fundación Federico Engels, teniendo en cuenta que ésta enaltece a los dirigentes de ese sistema político.', party: 'Vox', author: 'Lourdes Méndez Monasterio, Carlos Flores Juberías, Ignacio Gil Lázaro' },
       { text: 'Posición del Gobierno respecto al aumento de abortos de niños con Síndrome de Down en España, así como medidas previstas para proteger los derechos y la dignidad de las personas con Síndrome de Down.', party: 'Vox', author: 'María de la Cabeza Ruiz Solás, Rocío De Meer Méndez, Blanca Armario González' },
       { text: 'Acciones diplomáticas que ha emprendido o que va a emprender el Gobierno en respuesta al acto de espionaje de Marruecos a través del software Pegasus.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Alberto Asarta Cuevas, Ignacio Gil Lázaro' },
@@ -250,8 +249,11 @@ function showMenu() {
 
 function startLevel(id) {
   isCountdown = false;
-  currentLevel = LEVELS.find(l => l.id === id);
-  currentLevel.questions = balancedPick(currentLevel.questions, currentLevel.parties, 10);
+  const original = LEVELS.find(l => l.id === id);
+  currentLevel = {
+    ...original,
+    questions: balancedPick(original.questions, original.parties, 10)
+  };
   currentQ = 0;
   lives = 3;
   score = 0;
@@ -266,20 +268,18 @@ function balancedPick(allQuestions, parties, total) {
   const byParty = {};
   parties.forEach(p => byParty[p] = []);
   allQuestions.forEach(q => {
-    if (byParty[q.party]) byParty[q.party].push(q);
+    if (byParty[q.party]) byParty[q.party].push({...q});
   });
 
-  // Shuffle each party's pool
   parties.forEach(p => byParty[p] = shuffle([...byParty[p]]));
 
-  // First pass: guarantee minimum per party
   let picked = [];
   parties.forEach(p => {
     const take = Math.min(minPerParty, byParty[p].length);
-    picked.push(...byParty[p].splice(0, take));
+    for (let i = 0; i < take; i++) picked.push(byParty[p][i]);
+    byParty[p] = byParty[p].slice(take);
   });
 
-  // Second pass: fill remaining slots respecting max
   const remaining = [];
   parties.forEach(p => remaining.push(...byParty[p]));
   shuffle(remaining);
@@ -408,7 +408,7 @@ function updateTimerDisplay() {
   const barInner = document.querySelector('.timer-bar-inner');
   const timerText = document.querySelector('.timer-text');
   if (barInner) {
-    barInner.style.width = ((timeLeft / 10) * 100) + '%';
+    barInner.style.width = ((timeLeft / 60) * 100) + '%';
     barInner.classList.toggle('urgent', timeLeft <= 10);
   }
   if (timerText) {
