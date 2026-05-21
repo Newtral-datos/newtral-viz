@@ -328,4 +328,8 @@ body {
   .party-btn { padding: 8px 6px; font-size: 0.85rem; }
   .options { gap: 6px; }
   .menu-btn { margin: 10px auto 0; }
+  .timer-text { font-size: 1.3rem; }
+  .feedback { font-size: 1rem; }
+  .author-info { font-size: 0.9rem; }
+  
 }
