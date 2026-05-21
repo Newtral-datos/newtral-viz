@@ -19,7 +19,7 @@
 const PARTIES = {
   PP:    { name: 'PP',    color: '#1e4a90' },
   PSOE:  { name: 'PSOE',  color: '#f31912' },
-  VOX:   { name: 'Vox',   color: '#66bc29' },
+  Vox:   { name: 'Vox',   color: '#66bc29' },
   Sumar: { name: 'Sumar', color: '#e51c55' },
   ERC:   { name: 'ERC',   color: '#FFB232' },
   BILDU: { name: 'Bildu', color: '#00c19f' },
@@ -35,7 +35,7 @@ const LEVELS = [
   {
     id: 1,
     name: 'Nivel 1 — Fácil',
-    parties: ['PP','VOX','Sumar','BNG'],
+    parties: ['PP','Vox','Sumar','BNG'],
     questions: [
       { text: '¿Qué medidas adoptará para poner fin a los retrasos continuados e incidencias varias en los servicios ferroviarios de Galicia?', party: 'BNG', author: 'Néstor Rego Candamil' },
       { text: 'Actos violentos realizados por la afición ultra del Málaga FC (Frente Bokerón) en la ciudad de A Coruña el sábado 5 y domingo 6 de octubre e inacción del reducido dispositivo policial.', party: 'BNG', author: 'Néstor Rego Candamil' },
@@ -79,7 +79,7 @@ const LEVELS = [
   {
     id: 2,
     name: 'Nivel 2 — Medio',
-    parties: ['PP','VOX','Sumar','BNG','ERC','UPN'],
+    parties: ['PP','Vox','Sumar','BNG','ERC','UPN'],
     questions: [
       { text: 'Necesidad de mejora del cruce de la N-634 y la AC-840 en el término municipal de Vilasantar.', party: 'BNG', author: 'Néstor Rego Candamil' },
       { text: 'Actuaciones acometidas y previstas por el Ministerio de Agricultura, Pesca y Alimentación en el término municipal de Avión en los años 2025 y 2026.', party: 'BNG', author: 'Néstor Rego Candamil' },
@@ -128,7 +128,7 @@ const LEVELS = [
   {
     id: 3,
     name: 'Nivel 3 — Difícil',
-    parties: ['PP','VOX','Sumar','BNG','ERC','UPN','PSOE','Podemos'],
+    parties: ['PP','Vox','Sumar','BNG','ERC','UPN','PSOE','Podemos'],
     questions: [
       { text: 'Acuerdos alcanzados entre el Estado español y Portugal en la última cumbre bilateral.', party: 'BNG', author: 'Néstor Rego Candamil' },
       { text: 'Acusaciones de abusos sexuales y corrupción del Embajador del régimen talibán de Afganistán en el Estado español.', party: 'BNG', author: 'Néstor Rego Candamil' },
@@ -187,7 +187,7 @@ const LEVELS = [
   }
 ];
 
-const COUNTDOWN_PARTIES = ['PP','VOX','Sumar','BNG','ERC','UPN','PSOE','Podemos'];
+const COUNTDOWN_PARTIES = ['PP','Vox','Sumar','BNG','ERC','UPN','PSOE','Podemos'];
 const COUNTDOWN_QUESTIONS = [
   ...LEVELS[0].questions,
   ...LEVELS[1].questions,
