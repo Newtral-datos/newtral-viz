@@ -202,7 +202,7 @@ let score = 0;
 let answered = false;
 let isCountdown = false;
 let countdownTimer = null;
-let timeLeft = 3;
+let timeLeft = 60;
 let countdownQuestions = [];
 
 const app = document.getElementById('app');
@@ -394,7 +394,7 @@ function startCountdown() {
   score = 0;
   fails = 0;
   answered = false;
-  timeLeft = 3;
+  timeLeft = 60;
   showCountdownQuestion();
   clearCountdown();
   countdownTimer = setInterval(() => {
@@ -607,7 +607,7 @@ async function shareInstagram() {
     // Cargar imagen de fondo
     const bg = new Image();
     bg.crossOrigin = 'anonymous';
-    bg.src = 'story-bg.png';
+    bg.src = 'files/story-bg.png';
 
     await new Promise((resolve, reject) => {
       bg.onload = resolve;
