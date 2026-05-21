@@ -40,13 +40,40 @@ const LEVELS = [
       { text: '¿Qué medidas adoptará para poner fin a los retrasos continuados e incidencias varias en los servicios ferroviarios de Galicia?', party: 'BNG', author: 'Néstor Rego Candamil' },
       { text: 'Actos violentos realizados por la afición ultra del Málaga FC (Frente Bokerón) en la ciudad de A Coruña el sábado 5 y domingo 6 de octubre e inacción del reducido dispositivo policial.', party: 'BNG', author: 'Néstor Rego Candamil' },
       { text: 'Eliminación del servicio de tren AVANT de las 7:47 horas de Santiago de Compostela a Ourense para las personas usuarias con el nuevo abono recurrente.', party: 'BNG', author: 'Néstor Rego Candamil' },
-      { text: 'Opinión del Gobierno acerca de si el Presidente de Rusia ha injerido en la Unión Europea para desestabilizarla y por ende a nuestro país, agravando el problema catalán.', party: 'PP', author: 'Manuel García Féliz, Belén Hoyo Juliá, Carlos Floriano Corrales...' },
-      { text: 'Iniciativas que planteará el Ministerio de Educación, Formación Profesional y Deportes ante el hecho de que la práctica deportiva es mayoritaria entre hombres, independientemente de la frecuencia.', party: 'PP', author: 'Borja Sémper Pascual, Javier Merino Martínez, Óscar López Clavell...' },
+      { text: 'Funcionamiento del sistema VioGén.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Deficiencias en el despliegue de la fibra óptica en Lugo.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Posición del Gobierno ante los abusos del ICE en EE.UU.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Práctica del piragüismo federado en el dominio público hidráulico.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Transacciones de cuota de caballa.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Viaje del Rey emérito Su Majestad Don Juan Carlos I a Sanxenxo (Pontevedra) del 25 al 29/09/2023.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Utilización de habitaciones de la red de Paradores para la celebración de fiestas privadas con mujeres prostitutas.', party: 'PP', author: 'Pedro Muñoz Abrines, Mirian Guardiola Salmerón, Jaime Eduardo de Olano Vela...' },
+      { text: 'Motivo por el que los alumnos de la Academia General Básica de Suboficiales (AGBS) desfilaron el día de la Fiesta Nacional portando como prenda de cabeza boina, en vez de la correspondiente gorra de plato que les corresponde como suboficiales.', party: 'PP', author: 'Agustín Conde Bajén, Carlos Rojas García' },
+      { text: 'Atestado policial levantado por las Fuerzas y Cuerpos de Seguridad del Estado en relación con una supuesta fiesta ilegal celebrada durante la pandemia, en la que presuntamente participó un diputado socialista y en la que habría habido consumo de cocaína, por orden del Presidente del Gobierno y bajo conocimiento del Ministro del Interior.', party: 'PP', author: 'Ana Belén Vázquez Blanco, Carlos García Adanero, Fernando De Rosa Torner...' },
+      { text: 'Adhesión de la discoteca Fabrik en Madrid al programa de Bono Cultural Joven.', party: 'PP', author: 'Borja Sémper Pascual, María Soledad Cruz-Guzmán García, Eduardo Carazo Hermoso...' },
+      { text: 'Opinión del Gobierno acerca de si el feminismo es \'divertido\' como asegura el Sr. Presidente del Gobierno.', party: 'PP', author: 'Jaime Miguel De los Santos González, Sofía Acedo Reyes, Patricia Rodríguez Calleja...' },
+      { text: 'Conocimiento del Ministerio de Juventud e Infancia acerca de la evidencia científica existente sobre la tauromaquia y el rendimiento académico en menores de edad.', party: 'PP', author: 'Borja Sémper Pascual, María Soledad Cruz-Guzmán García, Eduardo Carazo Hermoso...' },
+      { text: 'Criterios que se tuvieron en cuenta a la hora de decidir Correos la emisión del sello del equipo de fútbol Zamora C.F. por la conmemoración de 53 años de historia.', party: 'PP', author: 'Rafael Antonio Hernando Fraile, Pedro Muñoz Abrines, Héctor Palencia Rubio...' },
+      { text: 'Opinión del Gobierno acerca de si el Presidente de Rusia ha injerido en la Unión Europea para desestabilizarla y por ende a nuestro país, agravando el problema catalán.', party: 'PP', author: 'Manuel García Félix, Belén Hoyo Juliá, Carlos Javier Floriano Corrales...' },
+      { text: 'Iniciativas que planteará el Ministerio de Educación, Formación Profesional y Deportes ante el hecho de que la práctica deportiva es mayoritaria entre hombres, independientemente de la frecuencia.', party: 'PP', author: 'Borja Sémper Pascual, Javier Merino Martínez, Óscar Clavell López...' },
+      { text: 'Medidas que desarrolla el Ministerio de Educación, Formación Profesional y Deportes para impulsar la aparición y desarrollo profesional de jóvenes talentos del fútbol femenino.', party: 'PP', author: 'Borja Sémper Pascual, Javier Merino Martínez, Óscar Clavell López...' },
+      { text: 'Opinión del Gobierno acerca de si los nuevos tratados, como el Pacto de Migración y Asilo, representan un peligroso desmantelamiento de los principios clave de los derechos humanos y la legislación sobre refugiados.', party: 'Sumar', author: 'Júlia Boada Danés, Gala Pin Ferrando, Aina Vidal Sáez' },
+      { text: 'Expedientes sancionadores iniciados contra los grupos de aficionados por vulnerar la Ley 20/2022, de Memoria Democrática, así como medidas previstas para impedir que el fútbol se siga utilizando como una plataforma para la difusión de mensajes de odio y de discriminación.', party: 'Sumar', author: 'Enrique Fernando Santiago Romero, Nahuel González López, Laura Vergara Román' },
+      { text: 'Información sobre el mundial de fútbol que organizarán España, Portugal y Marruecos, en el telediario del mediodía de Televisión Española (TVE) del día 05/10/2023, en el que se proyectó un mapa donde aparecía el Sáhara Occidental incluido en territorio marroquí.', party: 'Sumar', author: 'Enrique Fernando Santiago Romero' },
+      { text: 'Bloqueo de cuentas de asociaciones de mujeres de policías y militares involucrados en el intento de golpe de Estado e identificación de las personas, empresas o entidades donantes.', party: 'Sumar', author: 'Alberto Ibáñez Mezquita' },
       { text: 'Creación del registro de personas objetoras de conciencia en relación con el aborto.', party: 'Sumar', author: 'Júlia Boada Danés' },
       { text: 'Accesibilidad de la iglesia de San Juan de los Panetes, en Zaragoza.', party: 'Sumar', author: 'Jorge Pueyo Sanz' },
-      { text: 'Opinión del Gobierno sobre si el sistema político impuesto en Rusia a partir del golpe de Estado de noviembre de 1917 fue una dictadura, así como actuaciones previstas en relación con la Fundación Federico Engels, teniendo en cuenta que ésta enaltece a los dirigentes de ese sistema político.', party: 'VOX', author: 'Lourdes Méndez Monasterio, Carlos Flores Juberías, Ignacio Gil Lázaro' },
-      { text: 'Posición del Gobierno respecto al aumento de abortos de niños con Síndrome de Down en España, así como medidas previstas para proteger los derechos y la dignidad de las personas con Síndrome de Down.', party: 'VOX', author: 'María de la Cabez Ruiz Solás, Rocío De Meer Méndez, Blanca Armario González' },
-      { text: 'Acciones diplomáticas que ha emprendido o que va a emprender el Gobierno en respuesta al acto de espionaje de Marruecos a través del software Pegasus.', party: 'VOX', author: 'Javier Ortega Smith, Alberto Asrta Cuevas, Ignacio Gil Lázaro' },
+      { text: 'Opinión del Gobierno acerca de la situación del fútbol en general y de la Real Federación Española de Fútbol (RFEF) en particular.', party: 'Sumar', author: 'Fèlix Alonso Cantorné, Nahuel González López' },
+      { text: 'Subvenciones del Ministerio de Igualdad.', party: 'Sumar', author: 'Esther Gil de Reboleño Lastortres, Engracia Rivera Arias, Teslem Andala Ubbi...' },
+      { text: 'Datos de entradas irregulares al territorio español.', party: 'Sumar', author: 'Esther Gil de Reboleño Lastortres' },
+      { text: 'Estado en que se encuentra la obra atacada con pintura roja por dos \'activistas\' en el Museo Naval de Madrid en protesta por la celebración de la Fiesta Nacional.', party: 'Vox', author: 'Joaquín Robles López, Blanca Armario González, José Ramírez del Río' },
+      { text: 'Número de personas que consumen cocaína en España, así como programas que está elaborando el Gobierno para abordar las adicciones en la población española.', party: 'Vox', author: 'Tomás Fernández Ríos, Francisco José Alcaraz Martos' },
+      { text: 'Actividades programadas que promuevan y difundan la tauromaquia en el extranjero para el año 2024.', party: 'Vox', author: 'Joaquín Robles López, Blanca Armario González, José Ramírez del Río' },
+      { text: 'Estimación de gasto público total para la organización del Mundial de Fútbol del año 2030, así como sobre el número de partidos que se disputarán en España, Portugal y Marruecos, respectivamente.', party: 'Vox', author: 'José Ramírez del Río, Jacobo González-Robatto Perote, Joaquín Robles López' },
+      { text: 'Previsiones acerca de dar marcha atrás a la decisión de prohibir la caza en los parques nacionales para favorecer una gestión controlada de los ungulados, así como población de linces ibéricos y águilas reales en Monfragüe y Cabañeros antes y después de la prohibición e informes desarrollados para plantear la introducción de lobos en dichos parques nacionales.', party: 'Vox', author: 'José María Figaredo Álvarez-Sala, Ángel López Maraver, Patricia Rueda Perelló...' },
+      { text: 'Opinión del Gobierno sobre si el sistema político impuesto en Rusia a partir del golpe de Estado de noviembre de 1917 fue una dictadura, así como actuaciones previstas en relación con la Fundación Federico Engels, teniendo en cuenta que ésta enaltece a los dirigentes de ese sistema político.', party: 'Vox', author: 'Lourdes Méndez Monasterio, Carlos Flores Juberías, Ignacio Gil Lázaro' },
+      { text: 'Posición del Gobierno respecto al aumento de abortos de niños con Síndrome de Down en España, así como medidas previstas para proteger los derechos y la dignidad de las personas con Síndrome de Down.', party: 'Vox', author: 'María de la Cabeza Ruiz Solás, Rocío De Meer Méndez, Blanca Armario González' },
+      { text: 'Acciones diplomáticas que ha emprendido o que va a emprender el Gobierno en respuesta al acto de espionaje de Marruecos a través del software Pegasus.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Alberto Asarta Cuevas, Ignacio Gil Lázaro' },
+      { text: 'Medidas previstas para acabar con el problema de la superpoblación de gatos abandonados.', party: 'Vox', author: 'Rocío De Meer Méndez, Tomás Fernández Ríos, Carlos Hernández Quero' }
     ]
   },
   {
@@ -56,14 +83,46 @@ const LEVELS = [
     questions: [
       { text: 'Necesidad de mejora del cruce de la N-634 y la AC-840 en el término municipal de Vilasantar.', party: 'BNG', author: 'Néstor Rego Candamil' },
       { text: 'Actuaciones acometidas y previstas por el Ministerio de Agricultura, Pesca y Alimentación en el término municipal de Avión en los años 2025 y 2026.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Bloqueos indiscriminados de páginas web por La Liga y Movistar.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: '¿Considera razonable y justa la propuesta realizada por su Ministerio de aumentar las cotizaciones de los autónomos?', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Mal estado del firme de la AP-9.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Medidas previstas para evitar la expansión de la peste porcina.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Cruce del puente del Pedrido en Paderne.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Opinión del Gobierno acerca del veto de la Federación Española de Baloncesto a la equipación del Club Deportivo Bisbal Bàsquet que se basa en la bandera estelada catalana.', party: 'ERC', author: 'Etna Estrems Fayos' },
       { text: '¿Siguen existiendo las cloacas del Estado?', party: 'ERC', author: 'Francesc-Marc Álvaro Vidal' },
+      { text: 'Regularización de la situación de los exjugadores profesionales de fútbol que ejercieron su actividad durante los años 60 y 70 en lo que se refiere a la cotización a la Seguridad Social, al no ser reconocidos por el Estado español como trabajadores.', party: 'ERC', author: 'Etna Estrems Fayos, Jordi Salvador i Duch' },
+      { text: 'Controles sanitarios a la importación de café.', party: 'ERC', author: 'Inés Granollers Cunillera' },
+      { text: 'Medidas previstas ante el hecho de que, según el Delegado del Gobierno para el Plan Nacional sobre Drogas, \'estamos inundados de cocaína\'.', party: 'PP', author: 'Ester Muñoz de la Iglesia, María del Mar Vázquez Jiménez, Pablo Hispán Iglesias de Ussel...' },
+      { text: 'Constancia del Gobierno o de la empresa pública Paradores de que el exministro José Luis Ábalos acudiese al Parador Nacional de Teruel y organizase una fiesta en la suite principal del establecimiento, que acabó completamente destrozada.', party: 'PP', author: 'Pedro Muñoz Abrines, Mirian Guardiola Salmerón, Jaime Eduardo de Olano Vela...' },
+      { text: 'Confirmación acerca de si dio instrucciones el Presidente del Gobierno como ha denunciado Koldo García, de hacer desaparecer el atestado policial sobre una fiesta ilegal durante la pandemia en la que estaba presente un exdiputado del Grupo Parlamentario Socialista.', party: 'PP', author: 'Pedro Muñoz Abrines, Jaime Eduardo de Olano Vela, Álvaro Pérez López...' },
+      { text: 'Opinión del Gobierno acerca de que cada policía nacional y cada guardia civil debería tener su pistola Taser.', party: 'PP', author: 'María de las Mercedes Cantalapiedra Álvarez, Eduardo Carazo Hermoso, Ana Belén Vázquez Blanco' },
+      { text: 'Medidas previstas para garantizar el cumplimiento de la Ley 18/2013, de 12 de noviembre, para la regulación de la Tauromaquia como patrimonio cultural.', party: 'PP', author: 'Noelia Núñez González' },
+      { text: 'Razón por la que el Centro de Investigaciones Sociológicas no ha incluido ninguna pregunta sobre la tauromaquia en la encuesta sobre \'Cultura y Estilos de Vida\'.', party: 'PP', author: 'Borja Sémper Pascual, María Soledad Cruz-Guzmán García, Eduardo Carazo Hermoso...' },
       { text: 'Trabajadores de la empresa pública EXPASA Agricultura y Ganadería, S.M.E., SA que no hayan acudido a su puesto de trabajo durante más de diez días sin justificación entre los años 2018 y 2023.', party: 'PP', author: 'Santi Rodríguez Serra, Jaime Eduardo de Olano Vela, Álvaro Pérez López...' },
+      { text: 'Previsiones acerca de atender la solicitud del Presidente del Consejo General de Colegios Oficiales de Médicos y materializar alguna medida para frenar la desinformación y las pseudoterapias que constituye una amenaza para la salud pública.', party: 'PP', author: 'Ester Muñoz de la Iglesia, María del Mar Vázquez Jiménez, Elvira Velasco Morillo...' },
+      { text: 'Ayudas a los municipios aragoneses afectados por la DANA de octubre de 2024.', party: 'Sumar', author: 'Jorge Pueyo Sanz' },
+      { text: 'Agresión ultra en las fiestas de la Magdalena (Castellón) el día 02/03/2024.', party: 'Sumar', author: 'Nahuel González López, Enrique Fernando Santiago Romero' },
+      { text: 'Confirmación acerca de si tienen las Fuerzas y Cuerpos de Seguridad del Estado formación suficiente para tratar sin violencia a estudiantes de secundaria que se manifiestan pacíficamente así como acerca de si se impondrán sanciones a los agentes que participaron en la intervención contra estudiantes que se manifestaron en Madrid contra el bullying escolar.', party: 'Sumar', author: 'Enrique Fernando Santiago Romero, Fèlix Alonso Cantorné' },
+      { text: 'Autorización por la Junta de Extremadura de la caza del meloncillo (Herpestes ichneumon).', party: 'Sumar', author: 'Eloi Badia Casas' },
+      { text: 'Maltrato animal ante público infantil durante el desencajonamiento de toros en la plaza de toros de Barbastro.', party: 'Sumar', author: 'Jorge Pueyo Sanz' },
+      { text: 'Desalojo de espectadores en el partido de baloncesto entre el Dreamland Gran Canaria y el Hapoel Shlomo Tel Aviv, por mostrar banderas de Palestina y realizar cánticos en favor de la libertad del pueblo palestino.', party: 'Sumar', author: 'Vicenç Vidal Matas' },
       { text: 'Acumulación de más de 200 mil bidones con material radiactivo frente a las costas gallegas y medidas adoptadas con respecto a dicho vertido.', party: 'Sumar', author: 'Eloi Badia Casas, Júlia Boada Danés, Manuel Lago Peñas...' },
+      { text: 'Estado de las carreteras de titularidad estatal en la provincia de Ourense y la necesidad de actuaciones urgentes.', party: 'Sumar', author: 'Verónica Martínez Barbero, Manuel Lago Peñas' },
+      { text: 'Iniciativas previstas para denunciar la actuación de un taller incluido por el ayuntamiento en el programa oficial de la Fiesta Mayor de Granollers (Barcelona) que simulaba el lanzamiento de cócteles molotov a la policía y ha provocado contundentes críticas por parte de los sindicatos policiales.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Confirmación de si el Consejo Superior de Deportes recomendaría a un ayuntamiento o club que tenga intención de cambiar el césped artificial de un campo de fútbol llevarlo a cabo con los microplásticos prohibidos tras la aprobación del Reglamento (UE) 2023/2055, de la Comisión, de 25 de septiembre de 2023.', party: 'UPN', author: 'Alberto Catalán Higueras' },
       { text: 'Opinión del Gobierno acerca de la colaboración del exjefe de ETA, Mikel Antza, con la Red de Bibliotecas Públicas de Navarra.', party: 'UPN', author: 'Alberto Catalán Higueras' },
       { text: 'Motivos por los que se ha suspendido el \'Programa Reina Letizia para la Inclusión\'.', party: 'UPN', author: 'Alberto Catalán Higueras' },
       { text: 'Iniciativas que ha tomado el Gobierno para denunciar el genocidio de cristianos en Nigeria.', party: 'UPN', author: 'Alberto Catalán Higueras' },
-      { text: 'Cierre del puerto de Barbate (Cádiz) con el fin de impedir la toma de fotografías de narcolanchas que se encontraban allí refugiadas, así como medidas previstas para hacer frente al incremento de la presencia de narcolanchas en las costas españolas.', party: 'VOX', author: 'Francisco Javier Ortega Smith-Molina, Blanca Armario González, Ignacio Gil Lázaro...' },
-      { text: 'Avance y estructura del plan de indemnización para las víctimas de abusos sexuales en la Iglesia aprobado por el Gobierno.', party: 'VOX', author: 'Lourdes Méndez Monasterio, Carlos Flores Juberías, Ignacio Gil Lázaro' }
+      { text: 'Medidas previstas ante la decisión de la UEFA de abrir una investigación a dos jugadores de la selección española de fútbol por manifestar públicamente en Madrid que \'Gibraltar es español\'.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Formas de colaboración entre el Gobierno y las asociaciones de apoyo a las personas con adicciones, así como medidas específicas contra la adicción a la cocaína.', party: 'Vox', author: 'Tomás Fernández Ríos, Francisco José Alcaraz Martos' },
+      { text: 'Detención de dos hombres, que viajaban en un coche con más de 1 kilogramo de cocaína en la localidad murciana de Lorca.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Ignacio Gil Lázaro, David García Gomis' },
+      { text: 'Gasto total derivado del Bono Cultural que se han destinado a pagar entradas de discotecas y medidas previstas para evitar que los conciertos que se celebren en discotecas no puedan beneficiarse del dinero del citado bono reservado a las artes en vivo.', party: 'Vox', author: 'Joaquín Robles López, Blanca Armario González, José Ramírez del Río' },
+      { text: 'Apuñalamiento de una mujer en el barrio madrileño de Carabanchel el día 13/02/2024, así como intervención de un cabo del Ejército de Tierra.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Ignacio Gil Lázaro, David García Gomis' },
+      { text: 'Medidas previstas para proteger y promover la tauromaquia en todo el territorio nacional.', party: 'Vox', author: 'Joaquín Robles López, Blanca Armario González, José Ramírez del Río' },
+      { text: 'Sedes que albergarán los partidos del mundial de fútbol 2030 en España, así como número de partidos que se celebrarán en Galicia.', party: 'Vox', author: 'María José Rodríguez de Millán Parro, José María Figaredo Álvarez-Sala, José Ramírez del Río...' },
+      { text: 'Ayudas a los pacientes afectados por la esclerosis lateral amiotrófica para hacer frente a los gastos derivados de los cuidados que precisan.', party: 'Vox', author: 'María de la Cabeza Ruiz Solás, Rocío De Meer Méndez, Blanca Armario González' },
+      { text: 'Cierre del puerto de Barbate (Cádiz) con el fin de impedir la toma de fotografías de narcolanchas que se encontraban allí refugiadas, así como medidas previstas para hacer frente al incremento de la presencia de narcolanchas en las costas españolas.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Blanca Armario González, Ignacio Gil Lázaro...' },
+      { text: 'Avance y estructura del plan de indemnización para las víctimas de abusos sexuales en la Iglesia aprobado por el Gobierno.', party: 'Vox', author: 'Lourdes Méndez Monasterio, Carlos Flores Juberías, Ignacio Gil Lázaro' }
     ]
   },
   {
@@ -71,16 +130,59 @@ const LEVELS = [
     name: 'Nivel 3 — Difícil',
     parties: ['PP','VOX','Sumar','BNG','ERC','UPN','PSOE','Podemos'],
     questions: [
+      { text: 'Acuerdos alcanzados entre el Estado español y Portugal en la última cumbre bilateral.', party: 'BNG', author: 'Néstor Rego Candamil' },
       { text: 'Acusaciones de abusos sexuales y corrupción del Embajador del régimen talibán de Afganistán en el Estado español.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Ataques a los barcos de Global Sumud Flotilla con ayuda humanitaria para Gaza.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Normativa aprobada para la regularización extraordinaria de las personas migrantes que excluye a las personas saharauis apátridas.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Formalización de nuevos contratos para la compra de armamento a Israel, incumpliendo el compromiso del Gobierno de finalizar toda transacción militar con el Estado sionista.', party: 'BNG', author: 'Néstor Rego Candamil' },
+      { text: 'Retraso en las transposiciones de las directivas europeas sobre la resiliencia de entidades críticas y sobre un alto nivel de ciberseguridad y medidas legislativas que piensa promover el Gobierno en este ámbito.', party: 'ERC', author: 'Francesc-Marc Álvaro Vidal' },
+      { text: '¿Por qué no se ha extinguido la Fundación Nacional Francisco Franco?', party: 'ERC', author: 'Francesc-Marc Álvaro Vidal' },
       { text: 'Medidas previstas para remediar el memoricidio histórico del Pueblo Gitano.', party: 'ERC', author: 'Jordi Salvador i Duch, Francesc-Marc Álvaro Vidal' },
+      { text: 'Número de prestaciones por nacimiento y cuidado del menor que se han concedido en los últimos cinco años, así como número de estas prestaciones que han sido denegadas, anuladas y suspendidas respectivamente.', party: 'ERC', author: 'Jordi Salvador i Duch' },
+      { text: 'Caza de especies amenazadas.', party: 'Podemos', author: 'Ione Belarra Urteaga' },
       { text: 'Aparición de dos cabezas de lobo colgadas en un puente en Asturias.', party: 'Podemos', author: 'Martina Velarde Gómez' },
+      { text: 'Proyecto de ampliación del aeropuerto de El Prat.', party: 'Podemos', author: 'Ione Belarra Urteaga' },
+      { text: 'Toneladas de explosivo TNT enviadas en el año 2024 desde el Puerto de Cartagena y destino final de esta mercancía.', party: 'Podemos', author: 'Javier Sánchez Serna' },
+      { text: 'Valoración de los datos relativos al consumo de cocaína en nuestro país, así como previsiones acerca de reforzar o modificar su estrategia, de forma coordinada con las Comunidades Autónomas en aras de insistir en la prevención.', party: 'PP', author: 'Félix De las Cuevas Cortés, Elvira Velasco Morillo' },
+      { text: 'Asistencia del Ministro de Asuntos Exteriores, Unión Europea y Cooperación, el 23/06/2024, a la celebración que organizó el Conde de Godó con motivo de la fiesta de San Juan.', party: 'PP', author: 'Carlos Javier Floriano Corrales' },
+      { text: 'Trenes que circularon por la vía de los trenes accidentados Iryo y Renfe el día 18/01/2026 en Adamuz.', party: 'PP', author: 'Juan Bravo Baena, José Vicente Marí Bosó, Héctor Palencia Rubio...' },
+      { text: 'Premios nacionales de cultura, además del Premio Nacional de Tauromaquia, que valora suprimir el Ministro de Cultura durante esta legislatura.', party: 'PP', author: 'Borja Sémper Pascual, María Soledad Cruz-Guzmán García, Eduardo Carazo Hermoso...' },
+      { text: 'Motivación y fines específicos perseguidos para llevar a cabo modificaciones sobre la Orden Ministerial que regula la declaración de fiestas de interés turístico nacional e internacional.', party: 'PP', author: 'Mirian Guardiola Salmerón, Cristina Moreno Borrás, Francisco José Conde López...' },
+      { text: 'Mecanismos de participación ciudadana para evaluar y mejorar el uso de la inteligencia artificial en los servicios públicos.', party: 'PP', author: 'Silvia Franco González, Ángel Ibáñez Hernando' },
+      { text: 'Análisis y comprobaciones que hizo el Gobierno sobre la compañía \'Plus Ultra\' antes de conceder el rescate de 53 millones de euros.', party: 'PP', author: 'Pedro Muñoz Abrines, Jaime Eduardo de Olano Vela, Francisco José Conde López...' },
       { text: 'Garantía del Gobierno para finalizar el AVE Madrid-Lisboa, en lo que concierne al territorio nacional, en el año 2030.', party: 'PP', author: 'Alfonso Carlos Macías Gata, Antonio Cavacasillas Rodríguez, Héctor Palencia Rubio' },
+      { text: 'Medidas previstas para afrontar con garantías el reto que supone el turbo-capitalismo en materia de salud pública.', party: 'PP', author: 'Ester Muñoz de la Iglesia, María del Mar Vázquez Jiménez, Elvira Velasco Morillo...' },
+      { text: 'Forma en la que se puede promover la erradicación de actitudes racistas en determinados campos de fútbol.', party: 'PP', author: 'Javier Merino Martínez, Concepción Gamarra Ruiz-Clavijo, María de las Mercedes Cantalapiedra Álvarez...' },
+      { text: 'Avances llevados a cabo en el Pla Transformem Rodalíes de Cataluña.', party: 'PSOE', author: 'Ferran Verdejo Vicente' },
       { text: 'Medidas adoptadas para apoyar al pueblo valenciano tras la DANA.', party: 'PSOE', author: 'María Guijarro Ceballos' },
+      { text: 'Previsiones del IPCE de alguna actuación de rehabilitación en la Iglesia de San Juan el Real, en el municipio de Calatayud (Zaragoza).', party: 'PSOE', author: 'Víctor Javier Ruiz de Diego, Maribel García López' },
       { text: 'Variación del número de mujeres con protección activa por violencia de género en la provincia de Girona desde que Pedro Sánchez es Presidente del Gobierno.', party: 'PSOE', author: 'Blanca Cercas Mena, Marc Lamuà Estañol, José Zaragoza Alonso...' },
+      { text: 'Situación de la inversión en la nueva comisaría de Policía Nacional en Alcázar de San Juan.', party: 'PSOE', author: 'Cristina López Zamora, Gonzalo Redondo Cárdenas' },
+      { text: 'Medidas previstas por el Gobierno para estabilizar y reparar los daños que presentan las playas de Vélez-Málaga por los temporales producidos.', party: 'PSOE', author: 'María de las Nieves Ramírez Moreno' },
+      { text: 'Estado en que se encuentra el expediente de la redacción del Plan Director de la Iglesia de Santa María de la Asunción de Laredo (Cantabria).', party: 'PSOE', author: 'Noelia Cobo Pérez, Marc Lamuà Estañol' },
+      { text: 'Último dato disponible de cobertura 5G y de banda ancha en la Comunidad Foral de Navarra.', party: 'PSOE', author: 'Adriana Maldonado López, Iván Cacho Isla, Alberto Rojo Blas...' },
+      { text: 'Apertura de algún expediente a otras fiestas de interés turístico nacional que incurren en el mismo tipo de discriminación por razón del género que la Semana Santa de Sagunt debido a la exclusión de las mujeres en la Cofradía de la Purísima Sangre.', party: 'Sumar', author: 'Alberto Ibáñez Mezquita' },
+      { text: 'Acto del Ministerio de Ciencia, Innovación y Universidades en Valencia con el título \'Feminismo en Democracia\'.', party: 'Sumar', author: 'Alberto Ibáñez Mezquita' },
+      { text: 'Anuncio de que los menores de 16 años podrán acudir a las corridas de toros acompañados de un adulto en las Illes Balears.', party: 'Sumar', author: 'Vicenç Vidal Matas, Nahuel González López' },
+      { text: 'Número de abortos que se realizan en cada provincia, y de los que se ejercen en centros públicos, así como porcentaje de casos en los que la mujer debe trasladarse a otra provincia o Comunidad Autónoma y medidas previstas para garantizar el derecho a la interrupción voluntaria del embarazo en la sanidad pública y en un centro próximo al domicilio.', party: 'Sumar', author: 'Júlia Boada Danés' },
+      { text: 'Eliminación del programa de verificación de datos de terceros, por parte de plataformas como Meta y X y compromiso con la eficacia de las políticas de protección contra la desinformación europea en España.', party: 'Sumar', author: 'Enrique Fernando Santiago Romero, Francisco Sierra Caballero' },
       { text: 'Forma en la que opera el turismo sobre la sequía.', party: 'Sumar', author: 'Alberto Ibáñez Mezquita' },
+      { text: 'Opinión que le merece al Gobierno que haya ayuntamientos en la Comunidad Foral de Navarra que recojan en sus programas oficiales de fiestas actos de enaltecimiento de terroristas de ETA presos.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Confirmación de si la final del Mundial de Fútbol 2030 será en el Estadio Santiago Bernabeu.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Medidas adoptadas para garantizar la preparación y la formación necesaria para que los profesionales cuidadores puedan llevar a cabo la atención a los afectados por la esclerosis lateral amiotrófica.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Iniciativas normativas previstas relacionadas con el uso del móvil en los centros escolares.', party: 'UPN', author: 'Alberto Catalán Higueras' },
+      { text: 'Descuentos que se aplican actualmente en los billetes de tren que oferta Renfe.', party: 'UPN', author: 'Alberto Catalán Higueras' },
       { text: 'Opinión del Gobierno sobre si la Venezuela de Nicolás Maduro es un régimen dictatorial.', party: 'UPN', author: 'Alberto Catalán Higueras' },
       { text: 'Inversiones de Adif en la provincia de Málaga desde el año 2018.', party: 'UPN', author: 'Alberto Catalán Higueras' },
-      { text: 'Previsiones acerca de construir alguna infraestructura para evitar el efecto de los temporales sobre las playas de Marbella.', party: 'VOX', author: 'Patricia Rueda Perelló, Carlos Hernández Quero, José María Figaredo Álvarez-Sala...' }
+      { text: 'Veracidad de las informaciones publicadas en los medios donde se manifiesta que en el economato del centro penitenciario de Ceuta no hay productos procedentes del cerdo.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Ignacio Gil Lázaro, David García Gomis' },
+      { text: 'Incautación en el puerto de Barcelona de 1.700 kilos de cocaína escondidos en sacos de azúcar procedentes de Colombia, número de personas detenidos y organización criminal a la que pertenecen.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Carina Mejías Sánchez, Juan José Aizcorbe Torra...' },
+      { text: 'Forma en la que están afectando las vedas de caza a la seguridad en la circulación, así como medidas previstas para reducir siniestros de circulación con implicación de animales.', party: 'Vox', author: 'Patricia Rueda Perelló, Carlos Hernández Quero, José Ramírez del Río...' },
+      { text: 'Detención del presunto autor de dos apuñalamientos en Ciempozuelos, Madrid, tras lanzar un elemento metálico dentro de la Embajada de los Estados Unidos.', party: 'Vox', author: 'Francisco Javier Ortega Smith-Molina, Rocío Aguirre Gil de Biedma, María de la Cabeza Ruiz Solás...' },
+      { text: 'Existencia de alguna forma de expresión artística distinta de la feria taurina de San Isidro que sea capaz de congregar el alto número de espectadores y durante tantos días seguidos en la capital de España.', party: 'Vox', author: 'Joaquín Robles López, Blanca Armario González, José Ramírez del Río' },
+      { text: 'Previsiones acerca de apoyar con financiación el proyecto de creación de un Centro de Concentración Deportiva en altura en la estación de esquí de La Covatilla (Salamanca).', party: 'Vox', author: 'José Ramírez del Río, Jacobo González-Robatto Perote, Joaquín Robles López' },
+      { text: 'Valoración acerca de si las condiciones actuales garantizan el bienestar animal y el correcto desempeño del servicio que prestan los perros antidroga.', party: 'Vox', author: 'Francisco José Alcaraz Martos, Ignacio Gil Lázaro, Carina Mejías Sánchez...' },
+      { text: 'Análisis por el Gobierno de las causas por las que se investiga a la compañía Plus Ultra Líneas Aéreas en el contexto de análisis de riesgos de reembolso de las ayudas otorgadas e información de la que dispone acerca de las recientes detenciones en la citada compañía.', party: 'Vox', author: 'Pablo Sáez Alonso-Muñumer, Emilio Jesús Del Valle Rodríguez, Jacobo González-Robatto Perote...' },
+      { text: 'Previsiones acerca de construir alguna infraestructura para evitar el efecto de los temporales sobre las playas de Marbella.', party: 'Vox', author: 'Patricia Rueda Perelló, Carlos Hernández Quero, José María Figaredo Álvarez-Sala...' }
     ]
   }
 ];
@@ -90,19 +192,6 @@ const COUNTDOWN_QUESTIONS = [
   ...LEVELS[0].questions,
   ...LEVELS[1].questions,
   ...LEVELS[2].questions,
-  { text: 'Ataques a los barcos de Global Sumud Flotilla con ayuda humanitaria para Gaza.', party: 'BNG', author: 'Néstor Rego Candamil' },
-  { text: 'Bloqueos indiscriminados de páginas web por La Liga y Movistar.', party: 'BNG', author: 'Néstor Rego Candamil' },
-  { text: 'Funcionamiento del sistema VioGén.', party: 'BNG', author: 'Néstor Rego Candamil' },
-  { text: '¿Por qué no se ha extinguido la Fundación Nacional Francisco Franco?', party: 'ERC', author: 'Francesc-Marc Álvaro Vidal' },
-  { text: 'Proyecto de ampliación del aeropuerto de El Prat.', party: 'Podemos', author: 'Ione Belarra Urteaga' },
-  { text: 'Previsiones acerca de atender la solicitud del Presidente del Consejo General de Colegios Oficiales de Médicos y materializar alguna medida para frenar la desinformación y las pseudoterapias que constituye una amenaza para la salud pública.', party: 'PP', author: 'Ester Muñoz de la Iglesia, María del Mar Vázquez Jiménez, Elvira Velasco Morillo...' },
-  { text: 'Avances llevados a cabo en el Pla Transformem Rodalíes de Cataluña.', party: 'PSOE', author: 'Ferran Verdejo Vicente' },
-  { text: 'Previsiones del IPCE de alguna actuación de rehabilitación en la Iglesia de San Juan el Real, en el municipio de Calatayud (Zaragoza).', party: 'PSOE', author: 'Víctor Javier Ruiz de Diego, Maribel García López' },
-  { text: 'Número de abortos que se realizan en cada provincia, y de los que se ejercen en centros públicos, así como porcentaje de casos en los que la mujer debe trasladarse a otra provincia o Comunidad Autónoma y medidas previstas para garantizar el derecho a la interrupción voluntaria del embarazo en la sanidad pública y en un centro próximo al domicilio.', party: 'Sumar', author: 'Júlia Boada Danés' },
-  { text: 'Eliminación del programa de verificación de datos de terceros, por parte de plataformas como Meta y X y compromiso con la eficacia de las políticas de protección contra la desinformación europea en España.', party: 'Sumar', author: 'Enrique Fernando Santiago Romero, Francisco Sierra Caballero' },
-  { text: 'Bloqueo de cuentas de asociaciones de mujeres de policías y militares involucrados en el intento de golpe de Estado e identificación de las personas, empresas o entidades donantes.', party: 'Sumar', author: 'Alberto Ibáñez Mezquita' },
-  { text: 'Iniciativas normativas previstas relacionadas con el uso del móvil en los centros escolares.', party: 'UPN', author: 'Alberto Catalán Higueras' },
-  { text: 'Descuentos que se aplican actualmente en los billetes de tren que oferta Renfe.', party: 'UPN', author: 'Alberto Catalán Higueras' },
 ];
 
 let currentLevel = null;
@@ -113,7 +202,7 @@ let score = 0;
 let answered = false;
 let isCountdown = false;
 let countdownTimer = null;
-let timeLeft = 60;
+let timeLeft = 3;
 let countdownQuestions = [];
 
 const app = document.getElementById('app');
@@ -162,12 +251,51 @@ function showMenu() {
 function startLevel(id) {
   isCountdown = false;
   currentLevel = LEVELS.find(l => l.id === id);
-  currentLevel.questions = shuffle([...currentLevel.questions]);
+  currentLevel.questions = balancedPick(currentLevel.questions, currentLevel.parties, 10);
   currentQ = 0;
   lives = 3;
   score = 0;
   answered = false;
   showQuestion();
+}
+
+function balancedPick(allQuestions, parties, total) {
+  const maxPerParty = Math.ceil(total / parties.length) + 1;
+  const minPerParty = Math.max(1, Math.floor(total / parties.length) - 1);
+
+  const byParty = {};
+  parties.forEach(p => byParty[p] = []);
+  allQuestions.forEach(q => {
+    if (byParty[q.party]) byParty[q.party].push(q);
+  });
+
+  // Shuffle each party's pool
+  parties.forEach(p => byParty[p] = shuffle([...byParty[p]]));
+
+  // First pass: guarantee minimum per party
+  let picked = [];
+  parties.forEach(p => {
+    const take = Math.min(minPerParty, byParty[p].length);
+    picked.push(...byParty[p].splice(0, take));
+  });
+
+  // Second pass: fill remaining slots respecting max
+  const remaining = [];
+  parties.forEach(p => remaining.push(...byParty[p]));
+  shuffle(remaining);
+
+  const count = {};
+  picked.forEach(q => count[q.party] = (count[q.party] || 0) + 1);
+
+  for (const q of remaining) {
+    if (picked.length >= total) break;
+    if ((count[q.party] || 0) < maxPerParty) {
+      picked.push(q);
+      count[q.party] = (count[q.party] || 0) + 1;
+    }
+  }
+
+  return shuffle(picked);
 }
 
 function showQuestion() {
@@ -266,7 +394,7 @@ function startCountdown() {
   score = 0;
   fails = 0;
   answered = false;
-  timeLeft = 60;
+  timeLeft = 3;
   showCountdownQuestion();
   clearCountdown();
   countdownTimer = setInterval(() => {
@@ -280,7 +408,7 @@ function updateTimerDisplay() {
   const barInner = document.querySelector('.timer-bar-inner');
   const timerText = document.querySelector('.timer-text');
   if (barInner) {
-    barInner.style.width = ((timeLeft / 60) * 100) + '%';
+    barInner.style.width = ((timeLeft / 10) * 100) + '%';
     barInner.classList.toggle('urgent', timeLeft <= 10);
   }
   if (timerText) {
@@ -374,6 +502,7 @@ function showCountdownResult() {
         '<p style="color:#888; font-size:0.9rem; margin-bottom:12px;">Comparte tu resultado</p>' +
         '<div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">' +
           '<button class="btn" onclick="shareImage()" id="btn-share">\uD83D\uDCF7 Compartir imagen</button>' +
+          '<button class="btn" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color:#fff;" onclick="shareInstagram()">📸 Instagram</button>' +
           '<button class="btn" style="background:#25D366;" onclick="shareWhatsApp()">\uD83D\uDCAC WhatsApp</button>' +
           '<button class="btn" style="background:#1DA1F2; color:#fff;" onclick="shareTwitter()">𝕏 Twitter</button>' +
         '</div>' +
@@ -461,6 +590,98 @@ async function shareImage() {
       btn.textContent = '\u2713 Texto copiado';
       setTimeout(() => { btn.textContent = '\uD83D\uDCF7 Compartir imagen'; }, 2000);
     }
+  }
+}
+
+async function shareInstagram() {
+  const btn = event.target;
+  btn.textContent = 'Generando...';
+  btn.disabled = true;
+
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext('2d');
+
+    // Cargar imagen de fondo
+    const bg = new Image();
+    bg.crossOrigin = 'anonymous';
+    bg.src = 'story-bg.png';
+
+    await new Promise((resolve, reject) => {
+      bg.onload = resolve;
+      bg.onerror = reject;
+    });
+
+    // Dibujar imagen de fondo
+    ctx.drawImage(bg, 0, 0, 1080, 1920);
+
+    // Recuadro de resultado en la parte inferior
+    const boxX = 60;
+    const boxY = 1450;
+    const boxW = 960;
+    const boxH = 340;
+    const radius = 12;
+
+    // Fondo del recuadro (blanco semitransparente)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, radius);
+    ctx.fill();
+
+    // Borde del recuadro
+    ctx.strokeStyle = '#01f3b3';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, radius);
+    ctx.stroke();
+
+    // Texto: título
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 48px Helvetica Neue, Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('¿Quién pregunta qué en el Congreso?', 540, boxY + 65);
+
+    // Texto: aciertos
+    ctx.font = 'bold 56px Helvetica Neue, Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#01f3b3';
+    ctx.fillText('\u2713 ' + score, 440, boxY + 160);
+
+    // Texto: fallos
+    ctx.fillStyle = '#ff4d4d';
+    ctx.fillText('\u2717 ' + fails, 640, boxY + 160);
+
+    // Texto: pie
+    ctx.font = '45px Helvetica Neue, Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#494949';
+    ctx.fillText('\u00BFPuedes superarme?', 540, boxY + 230);
+
+    // Texto: crédito
+    ctx.font = '40px Helvetica Neue, Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#bbbbbb';
+    ctx.fillText('Un juego de ', 420, boxY + 290);
+
+    ctx.font = 'bold 44px Helvetica Neue, Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#01f3b3';
+    ctx.fillText('Newtral.es', 650, boxY + 290);
+
+    // Descargar
+    const link = document.createElement('a');
+    link.download = 'resultado-story.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    btn.textContent = '\u2713 Imagen guardada';
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = '\uD83D\uDCF8 Instagram'; }, 3000);
+
+    alert('Imagen guardada. \u00C1brela en Instagram y comp\u00E1rtela en tus Stories.');
+
+  } catch (e) {
+    btn.textContent = '\uD83D\uDCF8 Instagram';
+    btn.disabled = false;
+    alert('Error al compartir por Instagram.');
   }
 }
 
