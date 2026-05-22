@@ -323,14 +323,14 @@ body {
 }
 
 @media (max-width: 480px) {
-  .header h1 { font-size: 1.2rem; }
-  .question-box { padding: 22px 20px; margin-bottom: 16px; min-height: 90px; }
+  .header h1 { font-size: 1.1rem; }
+  .question-box { padding: 20px 18px; margin-bottom: 14px; min-height: 90px; }
   .party-btn { padding: 8px 6px; font-size: 0.85rem; }
   .options { gap: 6px; }
   .menu-btn { margin: 10px auto 0; }
-  .timer-text { font-size: 1.3rem; }
+  .timer-text { font-size: 1.2rem; }
   .feedback { font-size: 1rem; }
   .author-info { font-size: 0.9rem; }
-  .question-box p { font-size: 0.87rem;
+  .question-box p { font-size: 0.95rem;
   
 }
