@@ -320,9 +320,13 @@ function showQuestion() {
         '<p>' + q.text + '</p>' +
         '<span class="quote-close">\u201D</span>' +
       '</div>' +
-      '<div class="options">' + partyButtons + '</div>' +
-      '<div class="feedback" id="feedback"></div>' +
-      '<div class="author-info" id="author-info"></div>' +
+      '<div class="options-wrapper">' +
+        '<div class="options">' + partyButtons + '</div>' +
+        '<div class="result-overlay" id="overlay" style="display:none;">' +
+          '<div class="feedback" id="feedback"></div>' +
+          '<div class="author-info" id="author-info"></div>' +
+        '</div>' +
+      '</div>' +
       '<button class="menu-btn" onclick="goToMenu()">\u2190 Men\u00FA</button>' +
     '</div>'
   );
@@ -359,6 +363,8 @@ function answer(pid) {
   }
 
   authorEl.textContent = '\u2014 ' + q.author;
+
+  document.getElementById('overlay').style.display = 'flex';
 
   setTimeout(() => { currentQ++; showQuestion(); }, 1800);
 }
@@ -443,9 +449,13 @@ function showCountdownQuestion() {
         '<p>' + q.text + '</p>' +
         '<span class="quote-close">\u201D</span>' +
       '</div>' +
-      '<div class="options">' + partyButtons + '</div>' +
-      '<div class="feedback" id="feedback"></div>' +
-      '<div class="author-info" id="author-info"></div>' +
+      '<div class="options-wrapper">' +
+        '<div class="options">' + partyButtons + '</div>' +
+        '<div class="result-overlay" id="overlay" style="display:none;">' +
+          '<div class="feedback" id="feedback"></div>' +
+          '<div class="author-info" id="author-info"></div>' +
+        '</div>' +
+      '</div>' +
       '<button class="menu-btn" onclick="goToMenu()">\u2190 Men\u00FA</button>' +
     '</div>'
   );
@@ -483,6 +493,8 @@ function answerCountdown(pid) {
   if (scoreEl) scoreEl.textContent = '\u2713 ' + score;
   const failEl = document.querySelectorAll('.progress-text')[1];
   if (failEl) failEl.textContent = '\u2717 ' + fails;
+
+  document.getElementById('overlay').style.display = 'flex';
 
   setTimeout(() => { currentQ++; if (timeLeft > 0) showCountdownQuestion(); }, 1200);
 }
