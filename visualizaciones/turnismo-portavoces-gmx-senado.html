@@ -411,19 +411,15 @@ g.append('text')
   .text(isMobile ? 'Senador desde el 20/05 →' : 'Senador desde el 20 de mayo →');
 
 
-// Inicializa pym.js en el hijo para enviar la altura real a la página padre
-if (typeof pym !== 'undefined') {
-  var pymChild = new pym.Child({ polling: 500 }); // Comprueba la altura cada 500ms
-  pymChild.sendHeight();
-} else {
-  // Por si acaso la librería tarda en cargar en GitHub, lo reintentamos al cargar la ventana
-  window.addEventListener('load', () => {
-    if (window.pym) {
-      var pymChild = new pym.Child({ polling: 500 });
-      pymChild.sendHeight();
-    }
-  });
+function notificarAltura() {
+  if (typeof pym !== 'undefined') {
+    var pymChild = new pym.Child();
+    pymChild.sendHeight();
+  }
 }
+notificarAltura();
+window.addEventListener('load', notificarAltura);
+setTimeout(notificarAltura, 300);
 
 </script>
 </body>
