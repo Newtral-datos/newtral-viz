@@ -22,26 +22,17 @@
   #chart-container {
     width: 100%;
     max-width: 1000px;
-    overflow: visible; /* Eliminamos el scroll para que el SVG sea 100% responsivo */
-  }
-
-  /* El SVG ahora se adapta dinámicamente sin importar el tamaño de la pantalla */
-  #chart {
-    display: block;
-    width: 100%;
-    height: auto;
+    overflow: visible;
   }
 
   h1 {
-    font-size: clamp(1.3rem, 4vw, 2rem); /* Escala de forma fluida según el tamaño de la pantalla */
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: clamp(1.3rem, 4vw, 2rem);
     font-weight: 700;
     line-height: 1.4;
     margin-bottom: 1.5rem;
     text-align: left;
   }
 
-  /* Estilos para las cajas de texto en el titular */
   h1 .portavoz { 
     background-color: #01f3b3; 
     color: #0a4a35; 
@@ -58,12 +49,11 @@
     display: inline-block;
   }
 
-  /* Evita que el gráfico se comprima demasiado en pantallas pequeñas */
+  /* Ajuste responsivo real: sin min-width estricto */
   #chart {
     display: block;
     width: 100%;
     height: auto;
-    min-width: 650px; 
   }
 
   /* Tooltip */
@@ -80,23 +70,20 @@
     transition: opacity 0.13s;
     z-index: 100;
     max-width: 260px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   }
   .tooltip .tt-name {
     font-weight: 700;
     font-size: 0.92rem;
     margin-bottom: 3px;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-
   .tooltip .tt-dates {
     font-size: 0.78rem;
     color: #555;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
   .tooltip .tt-partido {
     font-size: 0.72rem;
     margin-top: 3px;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   svg text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -111,25 +98,16 @@
     margin-top: 15px;
     font-size: clamp(0.75rem, 2vw, 0.85rem);
     color: #000;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     line-height: 1.4;
   }
   .source {
     margin-top: 5px;
     font-size: clamp(0.75rem, 2vw, 0.9rem);
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: #888; 
   }
 
-  /* Ajustes específicos para móviles */
   @media (max-width: 600px) {
-    body {
-      padding: 1rem 0.75rem;
-    }
-    /* Reduce sutilmente el tamaño de fuente general del SVG en pantallas pequeñas */
-    svg text {
-      font-size: 11px !important;
-    }
+    body { padding: 1rem 0.75rem; }
   }
 </style>
 </head>
@@ -153,17 +131,12 @@ const senators = [
   { id: 'espadas', name: 'Juan Espadas Cejas', partido: 'PSOE', color: '#ed1c24', row: 3 },
   { id: 'bailac', name: 'Sara Bailac Ardanuy', partido: 'ERC', color: '#ffb232', row: 4 },
   { id: 'elejabarrieta', name: 'Gorka Elejabarrieta Díaz', partido: 'Bildu', color: '#00c399', row: 5 },
-  
-  // Grupo Plural: Junts ahora está desdoblado en dos filas individuales e independientes
   { id: 'cleries', name: 'Josep Lluís Cleries', partido: 'Junts', color: '#00c4b3', row: 6 },
   { id: 'pujol', name: 'Eduard Pujol', partido: 'Junts', color: '#00c4b3', row: 7 }, 
   { id: 'sangines', name: 'Pedro Manuel Sanginés', partido: 'CC', color: '#ffd700', row: 8 },
   { id: 'armas', name: 'Aniceto Javier Armas', partido: 'AHI', color: '#00a650', row: 9 },
   { id: 'silva', name: 'María Carmen da Silva', partido: 'BNG', color: '#7ebcff', row: 10 },
-  
   { id: 'beltran', name: 'Estefanía Beltrán de Heredia Arroniz', partido: 'PNV', color: '#4b9e46', row: 11 },
-  
-  // Izquierda Confederal
   { id: 'delgado', name: 'Carla Delgado', partido: 'Más Madrid', color: '#5bc289', row: 12 },
   { id: 'ferrer', name: 'Juanjo Ferrer', partido: 'independiente', color: '#d9d9d9', row: 13 },
   { id: 'morera', name: 'Enric Xavier Morera', partido: 'Compromís', color: '#f37021', row: 14 },
@@ -171,7 +144,6 @@ const senators = [
   { id: 'barcos', name: 'Miren Uxue Barcos', partido: 'Geroa BAI', color: '#e30613', row: 16 }
 ];
 
-// Matriz de fechas actualizada (con Cleries y Pujol separados según su vigencia temporal)
 const activeData = [
   ["2023-08-17", ["granados", "arenas", "beltran", "delgado", "cleries", "bailac"]],
   ["2023-09-01", ["granados", "arenas", "beltran", "delgado", "cleries", "bailac"]],
@@ -234,22 +206,24 @@ activeData.forEach((row, i) => {
 });
 Object.values(openSlots).forEach(s => slots.push(s));
 
-// ── CONFIGURACIÓN DE GRUPOS (ACTUALIZADO A 17 FILAS TOTALES) ──
 const groups = [
   { name: 'PP', rows: [0, 1], color: '#1d428a' },
   { name: 'PSOE', rows: [2, 3], color: '#ed1c24' },
   { name: 'Izquierdas\npor la\nindependencia', rows: [4, 5] },
-  { name: 'Plural', rows: [6, 7, 8, 9, 10] }, // Actualizado: Ahora incluye de la 6 a la 10
+  { name: 'Plural', rows: [6, 7, 8, 9, 10] },
   { name: 'PNV', rows: [11], color: '#4b9e46' },
   { name: 'Izquierda\nConfederal', rows: [12, 13, 14, 15, 16] }
 ];
 
+// ── CÁLCULOS DINÁMICOS DE PANTALLA ──
 const isMobile = window.innerWidth < 600;
-const margin = { top: 40, right: isMobile ? 20 : 60, bottom: 20, left: isMobile ? 95 : 180 };
+const margin = { top: 40, right: isMobile ? 35 : 60, bottom: 20, left: isMobile ? 75 : 180 };
+
+// Establecemos el totalW en base al ancho de la pantalla para móviles o 1000px en escritorio
+const totalW = isMobile ? window.innerWidth - 30 : 1000;
+const w = totalW - margin.left - margin.right;
 const rowH = 18;
 const groupGap = 22;
-const totalW = 1000;
-const w = totalW - margin.left - margin.right;
 
 const rowYMap = {};
 let currentY = 0;
@@ -277,7 +251,12 @@ const xScale = d3.scaleTime()
   .domain([new Date(2023, 7, 1), new Date(2026, 5, 1)])
   .range([0, w]);
 
-const ticks = [
+// En móviles reducimos las marcas para que no se superpongan las fechas
+const ticks = isMobile ? [
+  new Date(2023, 8, 1), 
+  new Date(2024, 8, 1), 
+  new Date(2025, 8, 1)
+] : [
   new Date(2023, 8, 1), 
   new Date(2024, 2, 1), 
   new Date(2024, 8, 1), 
@@ -296,23 +275,22 @@ ticks.forEach(t => {
   g.append('text')
     .attr('x', tx).attr('y', -18)
     .attr('text-anchor', 'middle')
-    .attr('font-size', 13).attr('fill', '#494949')
+    .attr('font-size', isMobile ? 11 : 13)
+    .attr('fill', '#494949')
     .text(fmtAxis(t));
 });
 
-// Eje Y (Grupos políticos alineados como en el SVG)
+// Eje Y (Grupos políticos)
 groups.forEach(group => {
    const y1 = rowYMap[group.rows[0]];
    const y2 = rowYMap[group.rows[group.rows.length - 1]] + rowH;
    
-   // Línea espina lateral
    g.append('line')
     .attr('x1', -15).attr('x2', -15)
     .attr('y1', y1).attr('y2', y2)
     .attr('stroke', group.color || '#222')
     .attr('stroke-width', 3);
 
-   // Nombre del grupo
    const textY = (y1 + y2) / 2;
    const lines = group.name.split('\n');
    const textGroup = g.append('text')
@@ -320,24 +298,22 @@ groups.forEach(group => {
     .attr('y', textY)
     .attr('text-anchor', 'end')
     .attr('dominant-baseline', 'central')
-    .attr('font-size', isMobile ? 11 : 15)
+    .attr('font-size', isMobile ? 10 : 15) // Letra ligeramente más pequeña en el Y de móvil
     .attr('font-weight', 700)
     .attr('fill', group.color || '#000');
     
    lines.forEach((l, i) => {
       textGroup.append('tspan')
-        .attr('x', -25)
+        .attr('x', -22) // Acerqué el texto ligeramente a la línea
         .attr('dy', i === 0 ? (lines.length > 1 ? `-${(lines.length-1)*0.5}em` : '0') : '1.1em')
         .text(l);
    });
 });
 
-// Tooltip helpers
 const tooltip = d3.select('#tooltip');
-const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 function fmtDate(d) {
   const dia = String(d.getDate()).padStart(2, '0');
-  const mes = String(d.getMonth() + 1).padStart(2, '0'); // Los meses en JS van de 0 a 11
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
   const anio = d.getFullYear();
   return `${dia}/${mes}/${anio}`;
 }
@@ -390,7 +366,7 @@ Object.keys(partyLabels).forEach(pid => {
 
        const t = g.append('text')
          .attr('y', y + (p.dy || 0))
-         .attr('font-size', 13)
+         .attr('font-size', isMobile ? 11 : 13) // Tamaño dinámico para las etiquetas flotantes
          .attr('fill', p.color)
          .attr('dominant-baseline', 'central');
 
@@ -410,21 +386,16 @@ Object.keys(partyLabels).forEach(pid => {
    }
 });
 
-// Asterisco sobre el final de Josep Lluís Cleries (Junts) en Julio de 2024
 const cleriesLastSlot = slots.filter(s => s.person === 'cleries').pop();
 if (cleriesLastSlot) {
   g.append('text')
     .attr('x', xScale(cleriesLastSlot.end) + 4)
     .attr('y', rowYMap[6] + rowH/2 + 5)
-    .attr('font-size', 23)
+    .attr('font-size', isMobile ? 18 : 23)
     .attr('font-weight', 'bold')
     .attr('fill', '#000')
     .text('*');
 }
-
-
-
-
 </script>
 </body>
 </html>
