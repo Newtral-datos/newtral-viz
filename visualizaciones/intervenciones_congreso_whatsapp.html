@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intervenciones más largas — Congreso</title>
+<style>
+  #wa-chat {
+    background: #0b141a;
+    border-radius: 12px;
+    padding: 16px 12px;
+    max-width: 480px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  #wa-chat .wbar {
+    display: inline-block;
+    width: 3px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<div id="wa-chat"></div>
+
+<!-- hls.js: necesario para reproducir streams .m3u8 en navegadores que no sean Safari -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
+<script>
+const DATA = [
+  {nombre:"Alberto Núñez Feijóo", partido:"PP", color:"#1d6fb8", min:40.98, motivo:"Propuesta de candidato a la Presidencia del Gobierno de Pedro Sánchez", foto:"fotos/feijoo.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_007/cortes/mp4:15_000400_007_1_24288_725617.mp4/manifest.m3u8"},
+  {nombre:"Santiago Abascal Conde", partido:"Vox", color:"#5bc500", min:22.78, motivo:"Solicitud de comparecencia de Pedro Sánchez para hablar de una reunión mantenida en el marco del acuerdo entre la UE y Gibraltar", foto:"fotos/abascal.jpg", stream:""},
+  {nombre:"Francesc-Marc Álvaro Vidal", partido:"ERC", color:"#ffb232", min:21.95, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/alvaro.jpg", stream:""},
+  {nombre:"Ignacio Gil Lázaro", partido:"Vox", color:"#5bc500", min:18.28, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/gil.jpg", stream:""},
+  {nombre:"Rocío De Meer Méndez", partido:"Vox", color:"#5bc500", min:17.70, motivo:"Comparecencia de la ministra de Inclusión, Seguridad Social y Migraciones, Elma Saiz, para informar sobre la crisis migratoria vivida en España en 2023", foto:"fotos/demeer.jpg", stream:""},
+  {nombre:"Juan Diego Requena Ruiz", partido:"PP", color:"#1d6fb8", min:17.05, motivo:"Proposición de ley para garantizar la aportación de la energía nuclear en la descarbonización del sistema energético", foto:"fotos/requena.jpg", stream:""},
+  {nombre:"Enrique Fernando Santiago Romero", partido:"Sumar", color:"#e5007e", min:16.75, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/santiago.jpg", stream:""},
+  {nombre:"Agustín Santos Maraver", partido:"Sumar", color:"#e5007e", min:16.42, motivo:"Comparecencia del ministro de Asuntos Exteriores, Unión Europea y Cooperación, José Manuel Albares, para explicar el acuerdo alcanzado entre la UE y Gibraltar", foto:"fotos/santos.jpg", stream:""},
+  {nombre:"Ana Belén Vázquez Blanco", partido:"PP", color:"#1d6fb8", min:16.03, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/vazquez.jpg", stream:""},
+  {nombre:"Noemí Santana Perera", partido:"Podemos", color:"#6b2d8e", min:16.00, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, por los efectivos y planes llevados a cabo en el marco de la DANA", foto:"fotos/santana.jpg", stream:""}
+];
+
+const ICON_PLAY = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#e9edef"><path d="M8 5v14l11-7z" stroke="#e9edef" stroke-width="2" stroke-linejoin="round"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#e9edef"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+const ICON_MIC = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#34b7f1"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></svg>';
+
+function fmtDur(min){
+  const total = Math.round(min*60);
+  return Math.floor(total/60)+":"+String(total%60).padStart(2,"0");
+}
+function fmtSec(sec){
+  sec = Math.max(0, Math.round(sec));
+  return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0");
+}
+
+const maxMin = Math.max(...DATA.map(d=>d.min));
+
+function waveBars(min){
+  const n = 57;
+  const active = Math.round(n*(min/maxMin));
+  let bars = "";
+  for(let i=0;i<n;i++){
+    const h = 5 + Math.abs(Math.sin(i*0.9)*Math.cos(i*0.5))*15 + (i%3)*2;
+    bars += `<span class="wbar" style="height:${h.toFixed(1)}px; background:${i<active?'#8696a0':'#3b4a54'};"></span>`;
+  }
+  return bars;
+}
+
+const chat = document.getElementById("wa-chat");
+
+DATA.forEach((d,idx)=>{
+  const row = document.createElement("div");
+  row.style.cssText = "margin-bottom:14px;";
+  row.innerHTML = `
+    <div style="background:#202c33; color:#e9edef; border-radius:7px 7px 7px 0; padding:7px 9px 5px; max-width:88%; margin-bottom:3px; box-sizing:border-box;">
+      <div style="color:${d.color}; font-weight:600; font-size:12.5px; margin-bottom:2px;">${d.nombre}</div>
+      <div style="font-size:13.5px; line-height:1.35;">${d.motivo}</div>
+      </div>
+      <div style="background:#202c33; border-radius:7px 7px 7px 0; padding:11px 10px; max-width:88%; display:flex; align-items:center; gap:9px; box-sizing:border-box;">
+        <button class="wa-play" data-idx="${idx}" aria-label="Reproducir audio de ${d.nombre}" style="flex:0 0 auto; align-self:center; width:30px; height:30px; border-radius:50%; border:none; background:transparent; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; margin-bottom: 5px;">${ICON_PLAY}</button>      
+        <div style="flex:1 1 auto; display:flex; flex-direction:column; gap:3px; min-width:0;">
+          <div style="flex:1 1 auto; display:flex; flex-direction:column; gap:3px; min-width:0;">
+          <div class="wa-wave" data-idx="${idx}" style="position:relative; display:flex; align-items:center; justify-content:space-between; height:24px; margin-top:10px; padding:0 6px;">       
+            ${waveBars(d.min)}
+          <span class="wa-dot" data-idx="${idx}" style="position:absolute; top:50%; left:6px; width:11px; height:11px; border-radius:50%; background:#E9EDEF; transform:translate(-50%,-50%); pointer-events:none;"></span></div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="wa-time" data-idx="${idx}" style="font-size:11px; color:#8696a0;">${fmtDur(d.min)}</div>
+          <div style="font-size:11px; color:#8696a0;">${d.partido}</div>
+          </div>
+          </div>
+          </div>
+          <div style="position:relative; flex:0 0 auto;">
+        <div style="width:44px; height:44px; border-radius:50%; overflow:hidden; flex:0 0 auto;">
+          <img src="${d.foto}" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+        <div style="position:absolute; left:-2px; bottom:-2px; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center;">${ICON_MIC}</div>      </div>
+    </div>
+  `;
+  chat.appendChild(row);
+});
+
+const state = {};
+
+chat.querySelectorAll(".wa-play").forEach(btn=>{
+  const idx = btn.dataset.idx;
+  const wave = chat.querySelector(`.wa-wave[data-idx="${idx}"]`);
+  const timeEl = chat.querySelector(`.wa-time[data-idx="${idx}"]`);
+  const bars = Array.from(wave.querySelectorAll(".wbar"));
+  const dot = chat.querySelector(`.wa-dot[data-idx="${idx}"]`);
+  const d = DATA[idx];
+  const totalMin = d.min;
+
+  btn.addEventListener("click", ()=>{
+    if(state[idx] && state[idx].playing) pause(idx); else play(idx);
+  });
+
+  function paint(frac){
+    const cut = Math.round(bars.length*frac);
+    bars.forEach((b,bi)=>{ b.style.background = bi<cut ? '#8696a0' : '#3b4a54'; });
+    const w = wave.offsetWidth;
+    dot.style.left = (6 + frac*(w-12))+"px";
+  }
+
+  function stopOthers(i){
+    Object.keys(state).forEach(k=>{
+      if(k!==String(i) && state[k] && state[k].playing){
+        state[k].playing=false;
+        clearInterval(state[k].timer);
+        if(state[k].audio){ try{ state[k].audio.pause(); }catch(e){} }
+        const ob = chat.querySelector(`.wa-play[data-idx="${k}"]`);
+        if(ob) ob.innerHTML = ICON_PLAY;
+      }
+    });
+  }
+
+  // Reproducción real vía stream HLS. Devuelve true si pudo iniciar, false si no.
+  function tryStream(i){
+    if(!d.stream) return false;
+    if(!state[i]) state[i] = {};
+    let audio = state[i].audio;
+    if(!audio){
+      audio = document.createElement("video"); // elemento video oculto: reproduce HLS aunque solo queramos el sonido
+      audio.style.display = "none";
+      audio.playsInline = true;
+      document.body.appendChild(audio);
+      state[i].audio = audio;
+
+      const onTime = ()=>{
+        const dur = audio.duration || (totalMin*60);
+        const frac = Math.min(audio.currentTime/dur, 1);
+        paint(frac);
+        timeEl.textContent = fmtSec(dur - audio.currentTime);
+      };
+      audio.addEventListener("timeupdate", onTime);
+      audio.addEventListener("ended", ()=>{ pause(i); state[i].started=false; paint(0); timeEl.textContent=fmtDur(totalMin); });
+
+      if(audio.canPlayType("application/vnd.apple.mpegurl")){
+        // Safari: HLS nativo
+        audio.src = d.stream;
+      } else if(window.Hls && Hls.isSupported()){
+        const hls = new Hls();
+        state[i].hls = hls;
+        hls.loadSource(d.stream);
+        hls.attachMedia(audio);
+        hls.on(Hls.Events.ERROR, (evt, data)=>{
+          if(data.fatal){ console.warn("HLS error (posible CORS):", data); fallbackAnim(i); }
+        });
+      } else {
+        return false;
+      }
+    }
+    state[i].playing = true;
+    btn.innerHTML = ICON_PAUSE;
+    audio.play().catch(err=>{ console.warn("play() falló:", err); fallbackAnim(i); });
+    return true;
+  }
+
+  // Animación decorativa sin sonido (fallback)
+  function fallbackAnim(i){
+    if(state[i] && state[i].audio){ try{ state[i].audio.pause(); }catch(e){} }
+    if(!state[i]) state[i] = {};
+    if(state[i].pos==null) state[i].pos = 0;
+    state[i].playing = true;
+    btn.innerHTML = ICON_PAUSE;
+    const stepMs = 40, durMs = totalMin*1000;
+    clearInterval(state[i].timer);
+    state[i].timer = setInterval(()=>{
+      state[i].pos += stepMs;
+      const frac = Math.min(state[i].pos/durMs, 1);
+      paint(frac);
+      timeEl.textContent = fmtDur(totalMin*(1-frac));
+      if(frac>=1){ pause(i); state[i].pos=0; timeEl.textContent=fmtDur(totalMin); paint(0); }
+    }, stepMs);
+  }
+
+  function play(i){
+    stopOthers(i);
+    if(!tryStream(i)) fallbackAnim(i);
+  }
+
+  function pause(i){
+    if(state[i]){
+      state[i].playing=false;
+      clearInterval(state[i].timer);
+      if(state[i].audio){ try{ state[i].audio.pause(); }catch(e){} }
+    }
+    btn.innerHTML = ICON_PLAY;
+  }
+
+  function seekTo(frac){
+    frac = Math.max(0, Math.min(1, frac));
+    if(state[idx] && state[idx].audio && state[idx].audio.duration){
+      state[idx].audio.currentTime = frac * state[idx].audio.duration;
+    } else {
+      if(!state[idx]) state[idx] = {pos:0};
+      state[idx].pos = frac * totalMin * 1000;
+    }
+    paint(frac);
+    timeEl.textContent = state[idx]&&state[idx].audio&&state[idx].audio.duration
+      ? fmtSec(state[idx].audio.duration*(1-frac))
+      : fmtDur(totalMin*(1-frac));
+  }
+
+  function fracFromEvent(e){
+    const r = wave.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left - 6;
+    return x / (r.width - 12);
+  }
+
+  let dragging = false;
+  dot.style.pointerEvents = "auto";
+  dot.style.cursor = "pointer";
+  wave.style.cursor = "pointer";
+
+  wave.addEventListener("pointerdown", e=>{ dragging = true; seekTo(fracFromEvent(e)); e.preventDefault(); });
+  window.addEventListener("pointermove", e=>{ if(dragging) seekTo(fracFromEvent(e)); });
+  window.addEventListener("pointerup", ()=>{ dragging = false; });
+});
+</script>
+
+</body>
+</html>
