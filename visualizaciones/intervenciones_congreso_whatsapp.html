@@ -6,7 +6,7 @@
 <title>Intervenciones más largas — Congreso</title>
 <style>
   #wa-chat {
-    background: #0b141a;
+    background: #69f7d146;
     border-radius: 12px;
     padding: 16px 12px;
     max-width: 480px;
@@ -29,21 +29,21 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
 <script>
 const DATA = [
-  {nombre:"Alberto Núñez Feijóo", partido:"PP", color:"#1d6fb8", min:40.98, motivo:"Propuesta de candidato a la Presidencia del Gobierno de Pedro Sánchez", foto:"files/fotos/feijoo.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_007/cortes/mp4:15_000400_007_1_24288_725617.mp4/manifest.m3u8"},
-  {nombre:"Santiago Abascal Conde", partido:"Vox", color:"#5bc500", min:22.78, motivo:"Solicitud de comparecencia de Pedro Sánchez para hablar de una reunión mantenida en el marco del acuerdo entre la UE y Gibraltar", foto:"fotos/abascal.jpg", stream:""},
-  {nombre:"Francesc-Marc Álvaro Vidal", partido:"ERC", color:"#ffb232", min:21.95, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/alvaro.jpg", stream:""},
-  {nombre:"Ignacio Gil Lázaro", partido:"Vox", color:"#5bc500", min:18.28, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/gil.jpg", stream:""},
-  {nombre:"Rocío De Meer Méndez", partido:"Vox", color:"#5bc500", min:17.70, motivo:"Comparecencia de la ministra de Inclusión, Seguridad Social y Migraciones, Elma Saiz, para informar sobre la crisis migratoria vivida en España en 2023", foto:"fotos/demeer.jpg", stream:""},
-  {nombre:"Juan Diego Requena Ruiz", partido:"PP", color:"#1d6fb8", min:17.05, motivo:"Proposición de ley para garantizar la aportación de la energía nuclear en la descarbonización del sistema energético", foto:"fotos/requena.jpg", stream:""},
-  {nombre:"Enrique Fernando Santiago Romero", partido:"Sumar", color:"#e5007e", min:16.75, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/santiago.jpg", stream:""},
-  {nombre:"Agustín Santos Maraver", partido:"Sumar", color:"#e5007e", min:16.42, motivo:"Comparecencia del ministro de Asuntos Exteriores, Unión Europea y Cooperación, José Manuel Albares, para explicar el acuerdo alcanzado entre la UE y Gibraltar", foto:"fotos/santos.jpg", stream:""},
-  {nombre:"Ana Belén Vázquez Blanco", partido:"PP", color:"#1d6fb8", min:16.03, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/vazquez.jpg", stream:""},
-  {nombre:"Noemí Santana Perera", partido:"Podemos", color:"#6b2d8e", min:16.00, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, por los efectivos y planes llevados a cabo en el marco de la DANA", foto:"fotos/santana.jpg", stream:""}
+  {nombre:"Alberto Núñez Feijóo", partido:"PP", color:"#1d6fb8", min:40.98, motivo:"Propuesta de candidato a la Presidencia del Gobierno de Pedro Sánchez", foto:"fotos/feijoo.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_007/cortes/mp4:15_000400_007_1_24288_725617.mp4/manifest.m3u8"},
+  {nombre:"Santiago Abascal Conde", partido:"Vox", color:"#5bc500", min:22.78, motivo:"Solicitud de comparecencia de Pedro Sánchez para hablar de una reunión mantenida en el marco del acuerdo entre la UE y Gibraltar", foto:"fotos/abascal.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_039/cortes/smil:15_000400_039_0_24931_733473.smil/manifest.m3u8"},
+  {nombre:"Francesc-Marc Álvaro Vidal", partido:"ERC", color:"#ffb232", min:21.95, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/alvaro-vidal.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_123/cortes/smil:15_000400_123_1_26293_756832.smil/manifest.m3u8"},
+  {nombre:"Ignacio Gil Lázaro", partido:"Vox", color:"#5bc500", min:18.28, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/gil-lazaro.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_123/cortes/smil:15_000400_123_1_26293_756830.smil/manifest.m3u8"},
+  {nombre:"Rocío De Meer Méndez", partido:"Vox", color:"#5bc500", min:17.70, motivo:"Comparecencia de la ministra de Inclusión, Seguridad Social y Migraciones, Elma Saiz, para informar sobre la crisis migratoria vivida en España en 2023", foto:"fotos/de-meer.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_060/cortes/smil:15_000400_060_0_25222_738161.smil/manifest.m3u8"},
+  {nombre:"Juan Diego Requena Ruiz", partido:"PP", color:"#1d6fb8", min:17.05, motivo:"Proposición de ley para garantizar la aportación de la energía nuclear en la descarbonización del sistema energético", foto:"fotos/requena-ruiz.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_119/cortes/smil:15_000400_119_0_26256_755815.smil/manifest.m3u8"},
+  {nombre:"Enrique Fernando Santiago Romero", partido:"Sumar", color:"#e5007e", min:16.75, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/santiago-romero.jpg", stream:"directopartes('https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_123/cortes/smil:15_000400_123_1_26293_756831.smil/manifest.m3u8"},
+  {nombre:"Agustín Santos Maraver", partido:"Sumar", color:"#e5007e", min:16.42, motivo:"Comparecencia del ministro de Asuntos Exteriores, Unión Europea y Cooperación, José Manuel Albares, para explicar el acuerdo alcanzado entre la UE y Gibraltar", foto:"fotos/santos-maraver.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_136/cortes/smil:15_000400_136_1_26579_760140.smil/manifest.m3u8"},
+  {nombre:"Ana Belén Vázquez Blanco", partido:"PP", color:"#1d6fb8", min:16.03, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, para explicar el origen del apagón", foto:"fotos/vazquez-blanco.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_123/cortes/smil:15_000400_123_1_26293_756829.smil/manifest.m3u8"},
+  {nombre:"Noemí Santana Perera", partido:"Podemos", color:"#6b2d8e", min:16.00, motivo:"Comparecencia del ministro del Interior, Fernando Grande-Marlaska, por los efectivos y planes llevados a cabo en el marco de la DANA", foto:"fotos/santana-perera.jpg", stream:"https://streaming.congreso.es:8443/vod/ondemand/video/leg15/400/15_000400_087/cortes/smil:15_000400_087_1_25612_745015.smil/manifest.m3u8"}
 ];
 
-const ICON_PLAY = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#e9edef"><path d="M8 5v14l11-7z" stroke="#e9edef" stroke-width="2" stroke-linejoin="round"/></svg>';
-const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#e9edef"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
-const ICON_MIC = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#34b7f1"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#01f3b3"><path d="M8 5v14l11-7z" stroke="#01f3b3" stroke-width="2" stroke-linejoin="round"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#01f3b3"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+const ICON_MIC = '<svg viewBox="0 0 24 24" width="24" height="24" fill="#01f3b3"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></svg>';
 
 function fmtDur(min){
   const total = Math.round(min*60);
@@ -83,7 +83,7 @@ DATA.forEach((d,idx)=>{
           <div style="flex:1 1 auto; display:flex; flex-direction:column; gap:3px; min-width:0;">
           <div class="wa-wave" data-idx="${idx}" style="position:relative; display:flex; align-items:center; justify-content:space-between; height:24px; margin-top:10px; padding:0 6px;">       
             ${waveBars(d.min)}
-          <span class="wa-dot" data-idx="${idx}" style="position:absolute; top:50%; left:6px; width:11px; height:11px; border-radius:50%; background:#E9EDEF; transform:translate(-50%,-50%); pointer-events:none;"></span></div>
+          <span class="wa-dot" data-idx="${idx}" style="position:absolute; top:50%; left:6px; width:11px; height:11px; border-radius:50%; background:#01f3b3; transform:translate(-50%,-50%); pointer-events:none;"></span></div>
           <div style="display:flex; justify-content:space-between; align-items:center;">
           <div class="wa-time" data-idx="${idx}" style="font-size:11px; color:#8696a0;">${fmtDur(d.min)}</div>
           <div style="font-size:11px; color:#8696a0;">${d.partido}</div>
