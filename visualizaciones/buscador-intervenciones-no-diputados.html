@@ -55,7 +55,15 @@
       z-index: 10;
     }
 
-    .search-bar label {
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .filter-range { flex: 1; }
+
+    .filter-group label {
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.08em;
@@ -64,25 +72,26 @@
       white-space: nowrap;
     }
 
-    .search-bar input {
-      flex: 1;
+    .filter-group select {
+      min-width: 520px;
       border: 1.5px solid var(--border);
-      border-radius: 2px;
+      border-radius: 4px;
       padding: 0.6rem 0.9rem;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 0.95rem;
       color: var(--ink);
       background: var(--bg);
-      transition: border-color 0.2s;
       outline: none;
     }
 
-    .search-bar input:focus {
-      border-color: var(--accent);
-      background: #fff;
-    }
+    .filter-group select:focus { border-color: var(--accent); }
 
-    .search-bar input::placeholder { color: #aaa; }
+    .filter-group input[type="range"] {
+      accent-color: var(--accent);
+      cursor: pointer;
+      width: 100%;
+      outline: none;
+    }
 
     .count-bar {
       padding: 0.75rem 2.5rem;
@@ -195,6 +204,8 @@
     @media (max-width: 640px) {
       header, .search-bar, .count-bar, .results { padding-left: 1rem; padding-right: 1rem; }
       .search-bar { flex-wrap: wrap; }
+      .filter-group { width: 100%; }
+      .filter-group select { min-width: 0; width: 100%; }
       .card-segundos { margin-left: 0; }
     }
   </style>
@@ -206,8 +217,16 @@
 </header>
 
 <div class="search-bar">
-  <label for="q">Buscar</label>
-  <input id="q" type="search" placeholder="Nombre, cargo o comunidad…" autofocus>
+  <div class="filter-group">
+    <label for="cargo">Cargo</label>
+    <select id="cargo">
+      <option value="">Todos</option>
+    </select>
+  </div>
+  <div class="filter-group filter-range">
+    <label for="dur">Duración máxima: <span id="durVal"></span></label>
+    <input id="dur" type="range">
+  </div>
 </div>
 
 <div class="count-bar" id="count"></div>
@@ -460,30 +479,52 @@ function escapeHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function render(query) {
-  const q = normalize(query.trim());
-  const filtered = q
-    ? DATA.filter(p => normalize(p.nombre).includes(q) || normalize(p.cargo).includes(q))
-    : DATA;
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+const cargoSel = document.getElementById('cargo');
+const durInput = document.getElementById('dur');
+const durVal = document.getElementById('durVal');
+
+const cargos = [...new Set(DATA.map(p => p.cargo))].sort((a, b) => a.localeCompare(b));
+cargos.forEach(c => {
+  const opt = document.createElement('option');
+  opt.value = c;
+  opt.textContent = c;
+  cargoSel.appendChild(opt);
+});
+
+const maxSeg = Math.max(...DATA.map(p => p.segundos));
+durInput.min = 0;
+durInput.max = maxSeg;
+durInput.value = maxSeg;
+
+function render() {
+  const cargo = cargoSel.value;
+  const maxDur = Number(durInput.value);
+  durVal.textContent = `${maxDur} s.`;
+
+  const filtered = DATA.filter(p =>
+    (!cargo || p.cargo === cargo) && p.segundos <= maxDur
+  );
 
   const countEl = document.getElementById('count');
-  countEl.textContent = q
-    ? `${filtered.length} resultado${filtered.length !== 1 ? 's' : ''} para "${query.trim()}"`
-    : '';
+  countEl.textContent = `${filtered.length} resultado${filtered.length !== 1 ? 's' : ''}`;
 
   const container = document.getElementById('results');
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div class="no-results">No se encontraron resultados para <strong>${escapeHtml(query)}</strong></div>`;
+    container.innerHTML = `<div class="no-results">No se encontraron resultados</div>`;
     return;
   }
 
   container.innerHTML = filtered.map(p => `
     <div class="card">
       <div class="card-header">
-        <span class="card-name">${highlight(p.nombre, query.trim())}</span>
+        <span class="card-name">${escapeHtml(p.nombre)}</span>
         <span class="card-sep">—</span>
-        <span class="card-cargo">${highlight(p.cargo, query.trim())}</span>
+        <span class="card-cargo">${escapeHtml(p.cargo)}</span>
         <span class="card-segundos">${p.segundos} s.</span>
       </div>
       <div class="card-iniciativas">
@@ -494,8 +535,9 @@ function render(query) {
   `).join('');
 }
 
-document.getElementById('q').addEventListener('input', e => render(e.target.value));
-render('');
+cargoSel.addEventListener('change', render);
+durInput.addEventListener('input', render);
+render();
 </script>
 </body>
 </html>
