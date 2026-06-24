@@ -342,7 +342,7 @@ const data = [
   { foto: "files/fotos/presidente_pedro_sanchez.png", nombre: "Pedro Sánchez", cargo: "Presidente del Gobierno y diputado", partido: "PSOE", activo: true, sesiones: 38, ponderado: 38 },
   { foto: "files/fotos/ministra_isabel_rodriguez.jpg", nombre: "Isabel Rodríguez", cargo: "Ministra de Vivienda y Agenda Urbana y diputada", partido: "PSOE", activo: true, sesiones: 34, ponderado: 34 },
   { foto: "files/fotos/ministra-milagros-tolon.png", nombre: "Milagros Tolón", cargo: "Ministra de Educación, Formación Profesional y Deportes", partido: "PSOE", activo: true, sesiones: 6, ponderado: 32 },
-  { foto: "files/fotos/ministra_nadia_calviño.jpg", nombre: "Nadia Calviño", cargo: "Exvicepresidenta primera y exministra de Economía, Comercio y Empresa", partido: "PSOE", activo: false, sesiones: 1, ponderado: 32 },
+  { foto: "files/fotos/ministra_nadia_calvino.png", nombre: "Nadia Calviño", cargo: "Exvicepresidenta primera y exministra de Economía, Comercio y Empresa", partido: "PSOE", activo: false, sesiones: 1, ponderado: 32 },
   { foto: "files/fotos/ministro_angel_victor_torres.jpg", nombre: "Ángel Víctor Torres", cargo: "Ministro de Política Territorial y Memoria Democrática y diputado", partido: "PSOE", activo: true, sesiones: 31, ponderado: 31 },
   { foto: "files/fotos/ministra_yolanda_diaz.jpg", nombre: "Yolanda Díaz", cargo: "Vicepresidenta segunda, ministra de Trabajo y Economía Social y diputada", partido: "SUMAR", activo: true, sesiones: 31, ponderado: 31 },
   { foto: "files/fotos/ministro_oscar_puente.jpg", nombre: "Óscar Puente", cargo: "Ministro de Transportes y Movilidad Sostenible y diputado", partido: "PSOE", activo: true, sesiones: 30, ponderado: 30 },
@@ -356,8 +356,8 @@ const data = [
   { foto: "files/fotos/ministra_monica_garcia.jpg", nombre: "Mónica García", cargo: "Ministra de Sanidad", partido: "SUMAR", activo: true, sesiones: 17, ponderado: 17 },
   { foto: "files/fotos/ministro_jose_manuel_albares.jpg", nombre: "José Manuel Albares", cargo: "Ministro de Asuntos Exteriores, Unión Europea y Cooperación y diputado", partido: "PSOE", activo: true, sesiones: 14, ponderado: 14 },
   { foto: "files/fotos/ministro_jordi_hereu.jpg", nombre: "Jordi Hereu", cargo: "Ministro de Industria y Turismo", partido: "PSOE", activo: true, sesiones: 14, ponderado: 14 },
-  { foto: "files/fotos/ministro_carlos_cuerpo.jpg", nombre: "Carlos Cuerpo", cargo: "Vicepresidente primero y ministro de Economía, Comercio y Empresa", partido: "PSOE", activo: true, sesiones: 14, ponderado: 14 },
-  { foto: "files/fotos/ministro-oscar-lopez.jpg", nombre: "Óscar López", cargo: "Ministro para la Transformación Digital y de la Función Pública", partido: "PSOE", activo: true, sesiones: 11, ponderado: 14 },
+  { foto: "files/fotos/ministro_carlos_cuerpo.png", nombre: "Carlos Cuerpo", cargo: "Vicepresidente primero y ministro de Economía, Comercio y Empresa", partido: "PSOE", activo: true, sesiones: 14, ponderado: 14 },
+  { foto: "files/fotos/ministro-oscar-lopez.png", nombre: "Óscar López", cargo: "Ministro para la Transformación Digital y de la Función Pública", partido: "PSOE", activo: true, sesiones: 11, ponderado: 14 },
   { foto: "files/fotos/ministra_sira_abed.jpg", nombre: "Sira Rego", cargo: "Ministra de Juventud e Infancia", partido: "SUMAR", activo: true, sesiones: 9, ponderado: 9 },
   { foto: "files/fotos/ministro_ernest_urtasun.jpg", nombre: "Ernest Urtasun", cargo: "Ministro de Cultura", partido: "SUMAR", activo: true, sesiones: 7, ponderado: 7 },
   { foto: "files/fotos/ministra_diana_morant.jpg", nombre: "Diana Morant", cargo: "Ministra de Ciencia, Innovación y Universidades y diputada", partido: "PSOE", activo: true, sesiones: 7, ponderado: 7 },
@@ -415,7 +415,7 @@ function filterCards() {
       <div class="photo-wrap">
         <div class="photo-ring ${partidoClass}">
           <div class="photo-inner ${bwClass}" id="photo-inner-${slug}">
-            <img src="fotos/${slug}.jpg" alt="${p.nombre}"
+            <img src=${p.foto} alt="${p.nombre}"
                  onerror="this.parentNode.innerHTML='<div class=\'photo-placeholder\'><svg fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z\'/></svg></div>'">
           </div>
           </div>
