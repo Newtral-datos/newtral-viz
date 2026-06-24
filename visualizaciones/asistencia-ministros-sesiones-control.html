@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscador de Ministros</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #494949;
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #494949;
+    margin-bottom: 6px;
+  }
+
+  .search-wrap {
+    max-width: 560px;
+    margin: 0 auto 36px;
+    position: relative;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    padding: 14px 20px 14px 46px;
+    border: 2px solid #eeeeee;
+    border-radius: 4px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: #494949;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus {
+    border-color: #01f3b3;
+  }
+
+  .search-wrap input::placeholder {
+    color: #aaaaaa;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: #aaaaaa;
+    pointer-events: none;
+  }
+
+  .filters {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 7px 22px;
+    border-radius: 4px;
+    border: 2px solid #eeeeee;
+    background: #fff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #aaaaaa;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover {
+    border-color: #01f3b3;
+    color: #494949;
+  }
+
+  .filter-btn.active {
+    background: #01f3b3;
+    border-color: #01f3b3;
+    color: #494949;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: #fff;
+    border: 1.5px solid #eeeeee;
+    border-radius: 4px;
+    padding: 24px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Photo circle */
+  .photo-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .photo-ring {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .photo-ring.psoe { background: #f31912; }
+  .photo-ring.sumar { background: #e51c55; }
+
+  .photo-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #fff;
+  }
+
+  .photo-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .photo-inner.bw img {
+    filter: grayscale(100%);
+  }
+
+  /* Placeholder icon */
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f4f4;
+  }
+
+  .photo-placeholder svg {
+    width: 40px;
+    height: 40px;
+    color: #cccccc;
+  }
+
+  .photo-inner.bw .photo-placeholder {
+    filter: grayscale(100%);
+  }
+
+  /* Partido badge */
+  .partido-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+    color: #fff;
+  }
+
+  .partido-badge.psoe { background: #ff1109; }
+  .partido-badge.sumar { background: #fc7299; }
+
+  /* Inactivo tag */
+  .inactive-tag {
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #aaaaaa;
+    background: #f4f4f4;
+    border-radius: 2px;
+    padding: 2px 8px;
+    white-space: nowrap;
+    border: 1px solid #e5e5e5;
+  }
+
+  .card-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #494949;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .card-cargo {
+    font-size: 13px;
+    color: #aaaaaa;
+    line-height: 1.4;
+    margin-bottom: 14px;
+    max-width: 200px;
+  }
+
+  .divider {
+    width: 32px;
+    height: 2px;
+    background: #01f3b3;
+    border-radius: 2px;
+    margin: 0 auto 14px;
+  }
+
+  .stats {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+
+  .stat-label {
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #aaaaaa;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #494949;
+    line-height: 1;
+  }
+
+  .stat-divider {
+    width: 1.5px;
+    background: #eeeeee;
+    align-self: stretch;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .no-results {
+    text-align: center;
+    color: #aaaaaa;
+    font-size: 14px;
+    grid-column: 1 / -1;
+    padding: 40px 0;
+  }
+
+  .count {
+    text-align: center;
+    font-size: 21px;
+    color: #aaaaaa;
+    letter-spacing: 0.04em;
+    margin-bottom: 20px;
+  }
+
+  .count span {
+    color: #01f3b3;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Asistencia de los ministros y exministros de la XV legislatura a las sesiones de control en el Congreso</h1>
+</div>
+
+<div class="search-wrap">
+  <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+  </svg>
+  <input type="text" id="searchInput" placeholder="Buscar por nombre o partido…" oninput="filterCards()">
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="setFilter('todos', this)">Todos</button>
+  <button class="filter-btn" onclick="setFilter('PSOE', this)">PSOE</button>
+  <button class="filter-btn" onclick="setFilter('SUMAR', this)">Sumar</button>
+  <button class="filter-btn" onclick="setFilter('activos', this)">Activos</button>
+  <button class="filter-btn" onclick="setFilter('exministros', this)">Exministros</button>
+</div>
+
+<div class="count" id="count"></div>
+<div class="grid" id="grid"></div>
+
+<script>
+const data = [
+  { foto: "files/fotos/ministra_maria_jesus_montero.jpg", nombre: "María Jesús Montero", cargo: "Exvicepresidenta del Gobierno, exministra de Hacienda y exdiputada", partido: "PSOE", activo: false, sesiones: 49, ponderado: 55 },
+  { foto: "files/fotos/ministro_felix_bolanos.jpg", nombre: "Félix Bolaños", cargo: "Ministro de la Presidencia, Justicia y Relaciones con las Cortes y diputado", partido: "PSOE", activo: true, sesiones: 53, ponderado: 53 },
+  { foto: "files/fotos/ministro_fernando_marlaska.jpg", nombre: "Fernando Grande-Marlaska", cargo: "Ministro del Interior y diputado", partido: "PSOE", activo: true, sesiones: 50, ponderado: 50 },
+  { foto: "files/fotos/presidente_pedro_sanchez.png", nombre: "Pedro Sánchez", cargo: "Presidente del Gobierno y diputado", partido: "PSOE", activo: true, sesiones: 38, ponderado: 38 },
+  { foto: "files/fotos/ministra_isabel_rodriguez.jpg", nombre: "Isabel Rodríguez", cargo: "Ministra de Vivienda y Agenda Urbana y diputada", partido: "PSOE", activo: true, sesiones: 34, ponderado: 34 },
+  { foto: "files/fotos/ministra-milagros-tolon.png", nombre: "Milagros Tolón", cargo: "Ministra de Educación, Formación Profesional y Deportes", partido: "PSOE", activo: true, sesiones: 6, ponderado: 32 },
+  { foto: "files/fotos/ministra_nadia_calviño.jpg", nombre: "Nadia Calviño", cargo: "Exvicepresidenta primera y exministra de Economía, Comercio y Empresa", partido: "PSOE", activo: false, sesiones: 1, ponderado: 32 },
+  { foto: "files/fotos/ministro_angel_victor_torres.jpg", nombre: "Ángel Víctor Torres", cargo: "Ministro de Política Territorial y Memoria Democrática y diputado", partido: "PSOE", activo: true, sesiones: 31, ponderado: 31 },
+  { foto: "files/fotos/ministra_yolanda_diaz.jpg", nombre: "Yolanda Díaz", cargo: "Vicepresidenta segunda, ministra de Trabajo y Economía Social y diputada", partido: "SUMAR", activo: true, sesiones: 31, ponderado: 31 },
+  { foto: "files/fotos/ministro_oscar_puente.jpg", nombre: "Óscar Puente", cargo: "Ministro de Transportes y Movilidad Sostenible y diputado", partido: "PSOE", activo: true, sesiones: 30, ponderado: 30 },
+  { foto: "files/fotos/ministra_pilar_alegria.jpg", nombre: "Pilar Alegría", cargo: "Exministra de Educación, Formación Profesional y Deportes, exportavoz del Gobierno y exdiputada", partido: "PSOE", activo: false, sesiones: 24, ponderado: 30 },
+  { foto: "files/fotos/ministra-sara-aagesen.png", nombre: "Sara Aagesen", cargo: "Vicepresidenta tercera y ministra para la Transición Ecológica y el Reto Demográfico", partido: "PSOE", activo: true, sesiones: 19, ponderado: 30 },
+  { foto: "files/fotos/ministra_elma_saiz.jpg", nombre: "Elma Saiz", cargo: "Ministra de Inclusión, Seguridad Social y Migraciones y portavoz del Gobierno", partido: "PSOE", activo: true, sesiones: 29, ponderado: 29 },
+  { foto: "files/fotos/ministra_ana_redondo.jpg", nombre: "Ana Redondo", cargo: "Ministra de Igualdad", partido: "PSOE", activo: true, sesiones: 27, ponderado: 27 },
+  { foto: "files/fotos/ministro_luis_planas.jpg", nombre: "Luis Planas", cargo: "Ministro de Agricultura, Pesca y Alimentación y diputado", partido: "PSOE", activo: true, sesiones: 20, ponderado: 20 },
+  { foto: "files/fotos/ministra_margarita_robles.jpg", nombre: "Margarita Robles", cargo: "Ministra de Defensa y diputada", partido: "PSOE", activo: true, sesiones: 19, ponderado: 19 },
+  { foto: "files/fotos/ministra_teresa_ribera.jpg", nombre: "Teresa Ribera", cargo: "Exvicepresidenta Tercera, exministra para la Transición Ecológica y el Reto Demográfico y exdiputada", partido: "PSOE", activo: false, sesiones: 7, ponderado: 19 },
+  { foto: "files/fotos/ministra_monica_garcia.jpg", nombre: "Mónica García", cargo: "Ministra de Sanidad", partido: "SUMAR", activo: true, sesiones: 17, ponderado: 17 },
+  { foto: "files/fotos/ministro_jose_manuel_albares.jpg", nombre: "José Manuel Albares", cargo: "Ministro de Asuntos Exteriores, Unión Europea y Cooperación y diputado", partido: "PSOE", activo: true, sesiones: 14, ponderado: 14 },
+  { foto: "files/fotos/ministro_jordi_hereu.jpg", nombre: "Jordi Hereu", cargo: "Ministro de Industria y Turismo", partido: "PSOE", activo: true, sesiones: 14, ponderado: 14 },
+  { foto: "files/fotos/ministro_carlos_cuerpo.jpg", nombre: "Carlos Cuerpo", cargo: "Vicepresidente primero y ministro de Economía, Comercio y Empresa", partido: "PSOE", activo: true, sesiones: 14, ponderado: 14 },
+  { foto: "files/fotos/ministro-oscar-lopez.jpg", nombre: "Óscar López", cargo: "Ministro para la Transformación Digital y de la Función Pública", partido: "PSOE", activo: true, sesiones: 11, ponderado: 14 },
+  { foto: "files/fotos/ministra_sira_abed.jpg", nombre: "Sira Rego", cargo: "Ministra de Juventud e Infancia", partido: "SUMAR", activo: true, sesiones: 9, ponderado: 9 },
+  { foto: "files/fotos/ministro_ernest_urtasun.jpg", nombre: "Ernest Urtasun", cargo: "Ministro de Cultura", partido: "SUMAR", activo: true, sesiones: 7, ponderado: 7 },
+  { foto: "files/fotos/ministra_diana_morant.jpg", nombre: "Diana Morant", cargo: "Ministra de Ciencia, Innovación y Universidades y diputada", partido: "PSOE", activo: true, sesiones: 7, ponderado: 7 },
+  { foto: "files/fotos/ministro_pablo_bustinduy.jpg", nombre: "Pablo Bustinduy", cargo: "Ministro de Derechos Sociales, Consumo y Agenda 2030", partido: "SUMAR", activo: true, sesiones: 6, ponderado: 6 },
+  { foto: "files/fotos/ministro_jose_luis_escriva.jpg", nombre: "José Luis Escrivá", cargo: "Exministro para la Transformación Digital y de la Función Pública", partido: "PSOE", activo: false, sesiones: 1, ponderado: 5 },
+];
+
+let activeFilter = 'todos';
+
+function setFilter(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards();
+}
+
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  const filtered = data.filter(p => {
+    const matchSearch = !q ||
+      p.nombre.toLowerCase().includes(q) ||
+      p.partido.toLowerCase().includes(q);
+
+    const matchFilter =
+      activeFilter === 'todos' ? true :
+      activeFilter === 'PSOE' ? p.partido === 'PSOE' :
+      activeFilter === 'SUMAR' ? p.partido === 'SUMAR' :
+      activeFilter === 'activos' ? p.activo :
+      activeFilter === 'exministros' ? !p.activo : true;
+
+    return matchSearch && matchFilter;
+  });
+
+  const countEl = document.getElementById('count');
+  countEl.innerHTML = `<span>${filtered.length}</span> resultado${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<p class="no-results">No se encontraron resultados.</p>';
+    return;
+  }
+
+  filtered.forEach(p => {
+    const slug = p.nombre.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+    const partidoClass = p.partido === 'PSOE' ? 'psoe' : 'sumar';
+    const bwClass = !p.activo ? 'bw' : '';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      ${!p.activo ? '<span class="inactive-tag">Exministro/a</span>' : ''}
+      <div class="photo-wrap">
+        <div class="photo-ring ${partidoClass}">
+          <div class="photo-inner ${bwClass}" id="photo-inner-${slug}">
+            <img src="fotos/${slug}.jpg" alt="${p.nombre}"
+                 onerror="this.parentNode.innerHTML='<div class=\'photo-placeholder\'><svg fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z\'/></svg></div>'">
+          </div>
+          </div>
+        </div>
+        <span class="partido-badge ${partidoClass}">${p.partido}</span>
+      </div>
+      <div class="card-name">${p.nombre}</div>
+      <div class="card-cargo">${p.cargo}</div>
+      <div class="divider"></div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Sesiones<br>asistidas</div>
+          <div class="stat-value">${p.sesiones}</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-label">Sesiones<br>ponderadas<br>asistidas</div>
+          <div class="stat-value">${p.ponderado}</div>
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+filterCards();
+</script>
+</body>
+</html>
