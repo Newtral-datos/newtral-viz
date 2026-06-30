@@ -289,6 +289,60 @@
     flex-shrink: 0;
   }
 
+  .sort-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .sort-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #aaaaaa;
+  }
+
+  .sort-btn {
+    padding: 6px 16px;
+    border-radius: 4px;
+    border: 2px solid #eeeeee;
+    background: #fff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #aaaaaa;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .sort-btn:hover {
+    border-color: #01f3b3;
+    color: #494949;
+  }
+
+  .sort-btn.active {
+    border-color: #01f3b3;
+    color: #494949;
+  }
+
+  .sort-arrow {
+    font-size: 11px;
+    opacity: 0.5;
+  }
+
+  .sort-btn.active .sort-arrow {
+    opacity: 1;
+    color: #01f3b3;
+  }
+
   .no-results {
     text-align: center;
     color: #aaaaaa;
@@ -332,6 +386,19 @@
   <button class="filter-btn" onclick="setFilter('exministros', this)">Exministros</button>
 </div>
 
+<div class="sort-bar">
+  <span class="sort-label">Ordenar por</span>
+  <button class="sort-btn" id="sort-asistidas" onclick="setSort('asistidas', this)">
+    Sesiones asistidas <span class="sort-arrow">↓</span>
+  </button>
+  <button class="sort-btn" id="sort-cargo" onclick="setSort('cargo', this)">
+    Sesiones en su cargo <span class="sort-arrow">↓</span>
+  </button>
+  <button class="sort-btn" id="sort-ponderado" onclick="setSort('ponderado', this)">
+    % de asistencia <span class="sort-arrow">↓</span>
+  </button>
+</div>
+
 <div class="count" id="count"></div>
 <div class="grid" id="grid"></div>
 
@@ -368,6 +435,24 @@ const data = [
 ];
 
 let activeFilter = 'todos';
+let activeSort = null;
+let sortDir = 'desc';
+
+function setSort(field, btn) {
+  if (activeSort === field) {
+    sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    activeSort = field;
+    sortDir = 'desc';
+  }
+  document.querySelectorAll('.sort-btn').forEach(b => {
+    b.classList.remove('active');
+    b.querySelector('.sort-arrow').textContent = '↓';
+  });
+  btn.classList.add('active');
+  btn.querySelector('.sort-arrow').textContent = sortDir === 'desc' ? '↓' : '↑';
+  filterCards();
+}
 
 function setFilter(filter, btn) {
   activeFilter = filter;
@@ -380,6 +465,9 @@ function filterCards() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
+
+  const getSesionesAsistidas = p => parseInt(p.sesiones.split('/')[0]);
+  const getSesionesCargo = p => parseInt(p.sesiones.split('/')[1]);
 
   const filtered = data.filter(p => {
     const matchSearch = !q ||
@@ -395,6 +483,16 @@ function filterCards() {
 
     return matchSearch && matchFilter;
   });
+
+  if (activeSort) {
+    filtered.sort((a, b) => {
+      let va, vb;
+      if (activeSort === 'asistidas') { va = getSesionesAsistidas(a); vb = getSesionesAsistidas(b); }
+      else if (activeSort === 'cargo')  { va = getSesionesCargo(a);    vb = getSesionesCargo(b); }
+      else                              { va = a.ponderado;             vb = b.ponderado; }
+      return sortDir === 'desc' ? vb - va : va - vb;
+    });
+  }
 
   const countEl = document.getElementById('count');
   countEl.innerHTML = `<span>${filtered.length}</span> resultado${filtered.length !== 1 ? 's' : ''}`;
