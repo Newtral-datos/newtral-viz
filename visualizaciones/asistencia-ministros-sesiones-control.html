@@ -141,8 +141,8 @@
     flex-shrink: 0;
   }
 
-  .photo-ring.psoe { background: #f31912; }
-  .photo-ring.sumar { background: #e51c55; }
+  .photo-ring.psoe { background: transparent; }
+  .photo-ring.sumar { background: transparent; }
 
   .photo-inner {
     width: 100%;
@@ -238,6 +238,7 @@
     line-height: 1.4;
     margin-bottom: 14px;
     max-width: 200px;
+    flex: 1;
   }
 
   .divider {
@@ -336,7 +337,7 @@
 
 <script>
 const data = [
-  { foto: "files/fotos/ministra_maria_jesus_montero.jpg", nombre: "María Jesús Montero", cargo: "Exvicepresidenta del Gobierno, exministra de Hacienda y exdiputada", partido: "PSOE", activo: false, sesiones: 49, ponderado: 87.5 },
+  { foto: "files/fotos/ministra_maria_jesus_montero.jpg", nombre: "María Jesús Montero", cargo: "Exvicepresidenta del Gobierno, exministra de Hacienda y exdiputada", partido: "PSOE", activo: false, sesiones: "49/49", ponderado: 87.5 },
   { foto: "files/fotos/ministro_felix_bolanos.jpg", nombre: "Félix Bolaños", cargo: "Ministro de la Presidencia, Justicia y Relaciones con las Cortes y diputado", partido: "PSOE", activo: true, sesiones: 55, ponderado: 85.94 },
   { foto: "files/fotos/ministro_fernando_marlaska.jpg", nombre: "Fernando Grande-Marlaska", cargo: "Ministro del Interior y diputado", partido: "PSOE", activo: true, sesiones: 49, ponderado: 76.56 },
   { foto: "files/fotos/presidente_pedro_sanchez.png", nombre: "Pedro Sánchez", cargo: "Presidente del Gobierno y diputado", partido: "PSOE", activo: true, sesiones: 47, ponderado: 73.44 },
@@ -433,8 +434,8 @@ function filterCards() {
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
-          <div class="stat-label">Sesiones<br>ponderadas<br>asistidas</div>
-          <div class="stat-value">${p.ponderado}</div>
+          <div class="stat-label">Porcentaje de<br>asistencia<br></div>
+          <div class="stat-value">${String(p.ponderado).replace('.', ',')}%</div>
         </div>
       </div>
     `;
