@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cal-heatmap@4.2.4/dist/cal-heatmap.css">
+<style>
+  body { margin: 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+
+  .header-container {
+    max-width: 100%;
+    margin-bottom: 24px;
+  }
+  .titulo-principal {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #111;
+    margin: 0 0 10px 0;
+  }
+  .destacado-titulo {
+    background-color: #01f3b3;
+    padding: 1px 3px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+  .subtitulo {
+    font-size: 21px;
+    color: #555;
+    margin: 0;
+    font-weight: 400;
+  }
+  .caption {
+    font-size: 14px;
+    color: #888;
+    margin: 20px 0 0 0;
+  }
+  .caption a {
+    color: #888;
+    text-decoration: underline;
+  }
+  .caption a:hover {
+    color: #555;
+  }
+
+  #wrapper-movil { display: contents; }
+  #contenedor {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    max-width: 100%;
+  }
+  .col-anio { display: flex; flex-direction: column; gap: 4px; }
+  .col-anio .etiq-anio {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .ch-domain-text {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    fill: #444 !important;
+  }
+
+  @media (max-width: 600px) {
+    body { margin: 6px; }
+    .titulo-principal { font-size: 19px; }
+    .subtitulo { font-size: 15px; }
+
+    #wrapper-movil {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      width: 100%;
+    }
+
+    #contenedor {
+      display: flex;
+      flex-direction: row;
+      gap: 0;
+      flex: 1;
+    }
+    .col-anio {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex: 1;
+    }
+    .col-anio .etiq-anio {
+      display: block;
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      text-align: center;
+    }
+
+    #cal-2025 .ch-domain-text,
+    #cal-2026 .ch-domain-text { display: none; }
+  }
+
+  #cal-2025, #cal-2026,
+  .ch-subdomain-text {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  .ch-tooltip, 
+  div[role="tooltip"],
+  div[id^="ch-tooltip"] {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 6px !important;
+    opacity: 1 !important;
+  }
+
+  div[id^="ch-tooltip"] .ch-tooltip-arrow::before,
+  .ch-tooltip-arrow::before {
+    border-top-color: #ffffff !important;
+    border-bottom-color: #ffffff !important;
+  }
+
+  #ch-tooltip, #ch-tooltip * {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    color: #333333 !important;
+  }
+  #ch-tooltip { padding: 8px 10px; line-height: 1.5; }
+  .tt-fecha { font-weight: 600; color: #111111 !important; }
+  .tt-eventos { display: flex; align-items: center; gap: 6px; color: #565656 !important; margin-top: 4px; }
+  
+  .tt-chip {
+    display: inline-block;
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="header-container">
+  <h1 class="titulo-principal">
+    Los <span class="destacado-titulo">días con más actos</span> se concentraron en torno al 20N, aniversario de la muerte de Franco
+  </h1>
+  <p class="subtitulo">Número de actos agendados por día</p>
+</div>
+
+<div id="wrapper-movil">
+  <div id="contenedor">
+    <div class="col-anio">
+      <span class="etiq-anio">2025</span>
+      <div id="cal-2025"></div>
+    </div>
+    <div class="col-anio">
+      <span class="etiq-anio">2026</span>
+      <div id="cal-2026"></div>
+    </div>
+  </div>
+</div>
+
+<p class="caption">Autor: Newtral.es • Fuente: <a href="https://espanaenlibertad.gob.es/gl/agenda" target="_blank" rel="noopener">España en Libertad. 50 años</a></p>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cal-heatmap@4.2.4/dist/cal-heatmap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cal-heatmap@4.2.4/dist/plugins/Tooltip.min.js"></script>
+
+<script>
+const RANGO   = ['#f0fdf9', '#a2f9e4', '#49f6cc', '#01f3b3', '#01bc8b', '#008562'];
+const CORTES  = [1, 5, 10, 20, 40];
+const MESES   = ['Enero','Febrero','Marzo','Abril','Mayo',
+                 'Junio','Julio','Agosto','Septiembre','Octubre',
+                 'Noviembre','Diciembre'];
+
+function colorPara(v) {
+  if (v == null || v === 0) return RANGO[0];
+  let i = 0;
+  while (i < CORTES.length && v >= CORTES[i]) i++;
+  return RANGO[i];
+}
+
+function colorTextoPara(v) {
+  if (v == null || v < 20) return '#000000';
+  return '#ffffff';
+}
+
+const plantillaMesFijo = function (DateHelper) {
+  return {
+    name: 'mesFijo',
+    allowedDomainType: ['month'],
+    rowsCount() { return 7; },
+    columnsCount() { return 6; },
+    mapping: (startTimestamp, endTimestamp, defaultValues) => {
+      const first = DateHelper.date(startTimestamp).startOf('month');
+      const diasEnMes = first.daysInMonth();
+      const offset = (first.day() + 6) % 7;
+      const celdas = [];
+      for (let d = 0; d < diasEnMes; d++) {
+        const fecha = first.add(d, 'day');
+        const pos = offset + d;
+        celdas.push({
+          t: fecha.valueOf(),
+          x: Math.floor(pos / 7),
+          y: pos % 7,
+          ...defaultValues
+        });
+      }
+      return celdas;
+    },
+    extractUnit: (ts) => DateHelper.date(ts).startOf('day').valueOf()
+  };
+};
+
+function calcularCelda(vertical) {
+  const GUTTER = 3;
+  if (vertical) {
+    const anchoCol = window.innerWidth / 2;
+    const altoDisp = window.innerHeight - 160;
+    const w = Math.max(3, Math.floor((anchoCol - 6 * GUTTER) / 7));
+    const h = Math.max(3, Math.floor((altoDisp - 71 * GUTTER) / 72));
+    return { w, h };
+  } else {
+    const COLS = 72;
+    const ancho = document.getElementById('contenedor').clientWidth;
+    const disp = ancho - 40;
+    const c = Math.floor(disp / COLS) - GUTTER;
+    const lado = Math.max(5, Math.min(c, 18));
+    return { w: lado, h: lado };
+  }
+}
+
+function pintarAnio(selector, anioInicio, vertical) {
+  const { w, h } = calcularCelda(vertical);
+  const cal = new CalHeatmap();
+  cal.addTemplates(plantillaMesFijo);
+  return cal.paint(
+    {
+      itemSelector: selector,
+      data: { source: 'files/df_heatmap_contratos_espanalib.csv', type: 'csv', x: 'fecha', y: d => +d.num, defaultValue: 0 },
+      date: { start: new Date(`${anioInicio}-01-01`), locale: { weekStart: 1 } },
+      range: 12,
+      verticalOrientation: vertical,
+      domain: {
+        type: 'month',
+        gutter: 0,
+        dynamicDimension: false,
+        label: vertical
+          ? { text: null }
+          : { text: (timestamp) => MESES[new Date(timestamp).getMonth()], position: 'top', textAlign: 'start' }
+      },
+      subDomain: { type: 'mesFijo', radius: 2, width: w, height: h, gutter: 3 },
+      scale: { color: { type: 'threshold', range: RANGO, domain: CORTES } }
+    },
+    [
+      [Tooltip, {
+        text: (timestamp, value) => {
+          const fecha = new Date(timestamp).toLocaleDateString('es-ES',
+            { day: 'numeric', month: 'long', year: 'numeric' });
+          const n = value ?? 0;
+          const bgCol = colorPara(value);
+          const textCol = colorTextoPara(value);
+          
+          const chip = `<span class="tt-chip" style="background:${bgCol}; color:${textCol};">${n}</span>`;
+          return `<div class="tt-fecha">Fecha: ${fecha}</div>
+                  <div class="tt-eventos">Eventos: ${chip}</div>`;
+        }
+      }]
+    ]
+  );
+}
+
+const esMovil = window.matchMedia('(max-width: 600px)').matches;
+pintarAnio('#cal-2025', 2025, esMovil);
+pintarAnio('#cal-2026', 2026, esMovil);
+
+let timer;
+window.addEventListener('resize', () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    document.getElementById('cal-2025').innerHTML = '';
+    document.getElementById('cal-2026').innerHTML = '';
+    const movil = window.matchMedia('(max-width: 600px)').matches;
+    pintarAnio('#cal-2025', 2025, movil);
+    pintarAnio('#cal-2026', 2026, movil);
+  }, 250);
+});
+</script>
+
+</body>
+</html>
