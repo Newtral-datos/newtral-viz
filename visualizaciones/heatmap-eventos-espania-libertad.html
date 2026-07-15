@@ -289,6 +289,13 @@ window.addEventListener('resize', () => {
     pintarAnio('#cal-2026', 2026, movil);
   }, 250);
 });
+
+function enviarAltura() {
+  const alto = document.body.scrollHeight;
+  parent.postMessage({ tipo: 'altura-heatmap', alto }, '*');
+}
+window.addEventListener('load', enviarAltura);
+window.addEventListener('resize', () => setTimeout(enviarAltura, 400));
 </script>
 
 </body>
