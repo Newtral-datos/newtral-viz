@@ -221,9 +221,8 @@ function calcularCelda(vertical) {
   const GUTTER = 3;
   if (vertical) {
     const anchoCol = window.innerWidth / 2;
-    const altoDisp = window.innerHeight - 160;
     const w = Math.max(3, Math.floor((anchoCol - 6 * GUTTER) / 7));
-    const h = Math.max(3, Math.floor((altoDisp - 71 * GUTTER) / 72));
+    const h = w;
     return { w, h };
   } else {
     const COLS = 72;
