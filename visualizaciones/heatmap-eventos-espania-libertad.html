@@ -275,8 +275,10 @@ function pintarAnio(selector, anioInicio, vertical) {
 }
 
 const esMovil = window.matchMedia('(max-width: 600px)').matches;
-pintarAnio('#cal-2025', 2025, esMovil);
-pintarAnio('#cal-2026', 2026, esMovil);
+Promise.all([
+  pintarAnio('#cal-2025', 2025, esMovil),
+  pintarAnio('#cal-2026', 2026, esMovil)
+]).then(() => setTimeout(enviarAltura, 200));
 
 let timer;
 window.addEventListener('resize', () => {
@@ -285,8 +287,10 @@ window.addEventListener('resize', () => {
     document.getElementById('cal-2025').innerHTML = '';
     document.getElementById('cal-2026').innerHTML = '';
     const movil = window.matchMedia('(max-width: 600px)').matches;
-    pintarAnio('#cal-2025', 2025, movil);
-    pintarAnio('#cal-2026', 2026, movil);
+    Promise.all([
+      pintarAnio('#cal-2025', 2025, movil),
+      pintarAnio('#cal-2026', 2026, movil)
+    ]).then(() => setTimeout(enviarAltura, 200));
   }, 250);
 });
 
@@ -294,9 +298,6 @@ function enviarAltura() {
   const alto = document.body.scrollHeight;
   parent.postMessage({ tipo: 'altura-heatmap', alto }, '*');
 }
-
-window.addEventListener('load', () => setTimeout(enviarAltura, 500));
-window.addEventListener('resize', () => setTimeout(enviarAltura, 400));
 </script>
 
 </body>
