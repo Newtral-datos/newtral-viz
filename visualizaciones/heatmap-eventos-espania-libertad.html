@@ -294,7 +294,13 @@ function enviarAltura() {
   const alto = document.body.scrollHeight;
   parent.postMessage({ tipo: 'altura-heatmap', alto }, '*');
 }
-window.addEventListener('load', enviarAltura);
+
+['#cal-2025', '#cal-2026'].forEach(sel => {
+  new ResizeObserver(() => setTimeout(enviarAltura, 50))
+    .observe(document.querySelector(sel));
+});
+
+window.addEventListener('load', () => setTimeout(enviarAltura, 300));
 window.addEventListener('resize', () => setTimeout(enviarAltura, 400));
 </script>
 
