@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medidas del Plan de Acción por la Democracia</title>
+<style>
+  :root {
+    --negro: #000000;
+    --verde: #01f3b3;
+    --gris-claro: #aaaaaa;
+    --gris-oscuro: #494949;
+    --blanco: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--blanco);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--negro);
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin: 0 0 8px;
+    color: var(--negro);
+  }
+
+  .subtitulo {
+    font-size: 15px;
+    color: rgba(73, 73, 73, 0.85);
+    margin: 0 0 32px;
+  }
+
+  /* Enlaces dentro del comentario */
+  .comentario-interior a {
+    color: #01f3b3;
+    text-decoration: underline;
+  }
+
+  .comentario-interior a:hover {
+    opacity: 0.8;
+  }
+
+  .buscador {
+    position: relative;
+    margin-bottom: 8px;
+  }
+
+  .buscador input {
+    width: 100%;
+    padding: 14px 18px 14px 44px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--negro);
+    background: var(--blanco);
+    border: 1.5px solid #01f3b3;
+    border-radius: 4px;
+    outline: none;
+    transition: box-shadow 0.15s ease;
+  }
+
+  .buscador input::placeholder {
+    color: rgba(73, 73, 73, 0.55);
+  }
+
+  .buscador input:focus {
+    box-shadow: 0 0 0 3px rgba(1, 243, 179, 0.25);
+  }
+
+  .buscador svg {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 17px;
+    height: 17px;
+    stroke: rgba(73, 73, 73, 0.75);
+  }
+
+  .barra-inferior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin: 0 0 28px;
+  }
+
+  .contador {
+    font-size: 13px;
+    color: rgba(73, 73, 73, 0.85);
+    margin: 0;
+  }
+
+  .orden {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(73, 73, 73, 0.85);
+  }
+
+  .orden select {
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--negro);
+    background: var(--blanco);
+    border: 1.5px solid rgba(170, 170, 170, 0.5);
+    border-radius: 4px;
+    padding: 5px 10px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+
+  .orden select:focus {
+    border-color: rgba(1, 243, 179, 0.7);
+  }
+
+  .lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .medida {
+    border: 1px solid rgba(73, 73, 73, 0.14);
+    border-radius: 4px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+
+  .medida:hover {
+    border-color: rgba(170, 170, 170, 0.6);
+  }
+
+  .nombre-medida {
+    font-weight: 700;
+    font-size: 15.5px;
+    line-height: 1.4;
+    color: var(--negro);
+    margin-bottom: 10px;
+  }
+
+  .fila-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .estado-btn {
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    background: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    pointer-events: none; /* toda la tarjeta es clicable, el botón es solo visual */
+  }
+
+  .estado-completada {
+    background: rgba(1, 243, 179, 0.22);
+    color: rgba(0, 0, 0, 0.75);
+  }
+
+  .estado-tramite {
+    background: var(--blanco);
+    color: rgba(73, 73, 73, 0.85);
+    border-color: rgba(170, 170, 170, 0.6);
+  }
+
+  .estado-tramite-parlamentario {
+    background: rgba(73, 73, 73, 0.12);
+    color: rgba(73, 73, 73, 0.95);
+    border-color: rgba(73, 73, 73, 0.35);
+  }
+
+  .estado-no-iniciada {
+    background: var(--blanco);
+    color: var(--negro);
+    border-color: rgba(0, 0, 0, 0.55);
+  }
+
+  .institucion {
+    font-size: 12.5px;
+    color: rgba(73, 73, 73, 0.85);
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .flecha {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    stroke: #01f3b3;
+    transition: transform 0.2s ease;
+  }
+
+  .medida.abierto .flecha {
+    transform: rotate(90deg);
+  }
+
+  .institucion-label {
+    font-weight: 700;
+    color: rgba(73, 73, 73, 0.95);
+  }
+
+  .comentario {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease, margin-top 0.2s ease;
+  }
+
+  .comentario.abierto {
+    max-height: 300px;
+    margin-top: 14px;
+  }
+
+  .comentario-interior {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: rgba(73, 73, 73, 0.9);
+    border-top: 1px solid rgba(73, 73, 73, 0.14);
+    padding-top: 12px;
+  }
+
+  .sin-resultados {
+    font-size: 14px;
+    color: rgba(73, 73, 73, 0.85);
+    padding: 24px 0;
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    .fila-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .institucion {
+      white-space: normal;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Medidas del Plan de Acción por la Democracia</h1>
+  <p class="subtitulo">Busca cualquier medida del plan para consultar su estado</p>
+
+  <div class="buscador">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input type="text" id="buscadorInput" placeholder="Buscar medida, estado o institución...">
+  </div>
+
+  <div class="barra-inferior">
+    <p class="contador" id="contador"></p>
+    <div class="orden">
+      <label for="ordenSelect">Ordenar por</label>
+      <select id="ordenSelect">
+        <option value="ninguno">Sin ordenar</option>
+        <option value="estado">Estado</option>
+        <option value="alfabetico">Alfabético</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="lista" id="lista"></div>
+  <p class="sin-resultados" id="sinResultados" style="display:none;">No se han encontrado medidas que coincidan con la búsqueda.</p>
+</div>
+
+<script>
+  let medidas = [];
+
+  const lista = document.getElementById('lista');
+  const input = document.getElementById('buscadorInput');
+  const contador = document.getElementById('contador');
+  const sinResultados = document.getElementById('sinResultados');
+  const ordenSelect = document.getElementById('ordenSelect');
+
+  // Orden lógico de los estados posibles
+  const ordenEstado = {
+    'completada': 0,
+    'en trámite parlamentario': 1,
+    'en trámite': 2,
+    'no iniciada': 3
+  };
+
+  function claseEstado(estado) {
+    const e = estado.toLowerCase();
+    if (e.includes('completad')) return 'estado-completada';
+    if (e.includes('parlamentario')) return 'estado-tramite-parlamentario';
+    if (e.includes('no iniciada')) return 'estado-no-iniciada';
+    return 'estado-tramite';
+  }
+
+  // Parser de CSV sencillo, soporta campos entre comillas con comas dentro
+  function parseCSV(texto) {
+    const filas = [];
+    let fila = [];
+    let campo = '';
+    let entreComillas = false;
+
+    for (let i = 0; i < texto.length; i++) {
+      const c = texto[i];
+      const siguiente = texto[i + 1];
+
+      if (entreComillas) {
+        if (c === '"' && siguiente === '"') { campo += '"'; i++; }
+        else if (c === '"') { entreComillas = false; }
+        else { campo += c; }
+      } else {
+        if (c === '"') { entreComillas = true; }
+        else if (c === ',') { fila.push(campo); campo = ''; }
+        else if (c === '\n' || c === '\r') {
+          if (c === '\r' && siguiente === '\n') i++;
+          fila.push(campo); campo = '';
+          if (fila.length > 1 || fila[0] !== '') filas.push(fila);
+          fila = [];
+        } else { campo += c; }
+      }
+    }
+    if (campo !== '' || fila.length) { fila.push(campo); filas.push(fila); }
+
+    const [cabecera, ...resto] = filas;
+    return resto
+      .filter(f => f.length === cabecera.length)
+      .map(f => ({
+        medida: f[0].trim(),
+        estado: f[1].trim(),
+        comentario: f[2].trim(),
+        instituciones: f[3].trim()
+      }));
+  }
+
+  function cargarDatos(texto) {
+    medidas = parseCSV(texto);
+    render(medidas);
+  }
+
+  fetch('files/medidas-plan-accion.csv')
+    .then(res => res.text())
+    .then(cargarDatos);
+
+  function ordenar(datos) {
+    const criterio = ordenSelect.value;
+    const copia = [...datos];
+
+    if (criterio === 'alfabetico') {
+      copia.sort((a, b) => a.medida.localeCompare(b.medida, 'es'));
+    } else if (criterio === 'estado') {
+      copia.sort((a, b) => {
+        const va = ordenEstado[a.estado.toLowerCase()] ?? 99;
+        const vb = ordenEstado[b.estado.toLowerCase()] ?? 99;
+        return va - vb;
+      });
+    }
+
+    return copia;
+  }
+
+  function render(datos) {
+    lista.innerHTML = '';
+
+    if (datos.length === 0) {
+      sinResultados.style.display = 'block';
+    } else {
+      sinResultados.style.display = 'none';
+    }
+
+    datos.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'medida';
+      card.setAttribute('data-idx', idx);
+
+      card.innerHTML = `
+        <div class="nombre-medida">${item.medida}</div>
+        <div class="fila-meta">
+          <div class="institucion">
+            <svg class="flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+            <span><span class="institucion-label">Instituciones responsables:</span> ${item.instituciones}</span>
+          </div>
+          <button class="estado-btn ${claseEstado(item.estado)}">${item.estado}</button>
+        </div>
+        <div class="comentario" id="comentario-${idx}">
+          <div class="comentario-interior">${item.comentario}</div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        card.classList.toggle('abierto');
+        document.getElementById(`comentario-${idx}`).classList.toggle('abierto');
+      });
+
+      lista.appendChild(card);
+    });
+
+    contador.textContent = `${datos.length} medida${datos.length === 1 ? '' : 's'} encontrada${datos.length === 1 ? '' : 's'}`;
+  }
+
+  function filtrar() {
+    const q = input.value.trim().toLowerCase();
+    const filtradas = medidas.filter(item =>
+      item.medida.toLowerCase().includes(q) ||
+      item.estado.toLowerCase().includes(q) ||
+      item.instituciones.toLowerCase().includes(q) ||
+      item.comentario.toLowerCase().includes(q)
+    );
+    render(ordenar(filtradas));
+  }
+
+  input.addEventListener('input', filtrar);
+  ordenSelect.addEventListener('change', filtrar);
+</script>
+</body>
+</html>
