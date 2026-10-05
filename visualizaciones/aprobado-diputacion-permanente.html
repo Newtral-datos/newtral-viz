@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reales ecretos ley aprobados por la Diputación Permanente</title>
+<style>
+:root{--g:#01f3b3;--r:4px}
+*{box-sizing:border-box}
+body{margin:0;padding:24px 16px;background:#fff;color:#000;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;line-height:1.4}
+.wrap{max-width:1200px;margin:0 auto}
+h1{font-size:1.6rem;margin:0 0 20px;font-weight:700}
+.filters{display:flex;flex-wrap:wrap;gap:12px}
+.sel{position:relative;max-width:100%}
+.sel select{width:100%;appearance:none;-webkit-appearance:none;background:#fff;color:#000;font:inherit;font-size:.95rem;padding:9px 34px 9px 10px;border:2px solid var(--g);border-radius:var(--r);cursor:pointer}
+.sel select:focus{outline:none;box-shadow:0 0 0 3px rgba(1,243,179,.35)}
+.sel::after{content:"";position:absolute;right:12px;top:50%;width:10px;height:10px;margin-top:-7px;border-right:2px solid #000;border-bottom:2px solid #000;transform:rotate(45deg) scale(.8);pointer-events:none}
+#summary{margin:20px 0 24px;font-size:1.05rem;line-height:2}
+.box{background:var(--g);border-radius:var(--r);padding:2px 8px;font-weight:700;white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{border:1px solid #ddd;border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:6px;background:#fff;transition:transform .2s,box-shadow .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.12);border-color:var(--g)}
+.card h2{font-size:1rem;margin:0 0 6px;padding-bottom:10px;border-bottom:1px solid #ddd;font-weight:700;line-height:1.3}
+.card h2 a{color:var(--g);text-decoration:none;font-family:'Segoe UI Symbol','Noto Sans Symbols 2',sans-serif;margin-left:4px}
+.card h2 a:hover{color:#000}
+.pres{font-size:1.1rem;font-weight:400}
+.leg{color:#494949;font-size:.85rem}
+.dates{font-size:.85rem;margin-top:2px}
+.dates b{font-weight:600}
+.dates div{margin-top:2px}
+.empty{grid-column:1/-1;color:#666}
+@media(max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Reales Decretos Ley aprobados por la Diputación Permanente tras la convocatoria de elecciones</h1>
+<div class="filters">
+ <div class="sel"><select id="fPartido" aria-label="Partido"></select></div>
+ <div class="sel"><select id="fPres" aria-label="Presidente"></select></div>
+ <div class="sel"><select id="fLeg" aria-label="Legislatura"></select></div>
+ <div class="sel"><select id="fMom" aria-label="Momento de presentación">
+   <option value="post">Presentado después de la convocatoria</option>
+   <option value="ant">Presentado antes de la convocatoria</option>
+   <option value="all">Todos</option></select></div>
+</div>
+<p id="summary"></p>
+<div class="cards" id="cards"></div>
+</div>
+<script>
+const DATA = [{"leg": 4, "tit": "Real Decreto-Ley 4/1993, de 26 de marzo, por el que se autoriza el resarcimiento de los daños causados como consecuencia de la rotura de la presa de Tous y se concede un crédito extraordinario por importe de 19.000 millones de pesetas.", "fecha": "26/03/1993", "pres": "Felipe González", "partido": "PSOE", "conv": "12/04/1993", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=IV&_iniciativas_id=130%2F000023"}, {"leg": 4, "tit": "Real Decreto-Ley 5/1993, de 16 de abril, por el que se autorizan determinadas actuaciones en relación con las cuencas del Tajo y el Segura.", "fecha": "16/04/1993", "pres": "Felipe González", "partido": "PSOE", "conv": "12/04/1993", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=IV&_iniciativas_id=130%2F000024"}, {"leg": 4, "tit": "Real Decreto-Ley 6/1993, de 23 de abril, sobre abono de subvenciones por gastos electorales (Elecciones 1991).", "fecha": "23/04/1993", "pres": "Felipe González", "partido": "PSOE", "conv": "12/04/1993", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=IV&_iniciativas_id=130%2F000025"}, {"leg": 5, "tit": "Real Decreto-Ley 10/1995, de 28 de diciembre, de compensación de daños por la rotura de la Presa de Tous.", "fecha": "28/12/1995", "pres": "Felipe González", "partido": "PSOE", "conv": "08/01/1996", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=V&_iniciativas_id=130%2F000034"}, {"leg": 5, "tit": "Real Decreto-Ley 11/1995, de 28 de diciembre, por el que se establecen las normas aplicables al tratamiento de las aguas residuales urbanas.", "fecha": "28/12/1995", "pres": "Felipe González", "partido": "PSOE", "conv": "08/01/1996", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=V&_iniciativas_id=130%2F000035"}, {"leg": 5, "tit": "Real Decreto-Ley 12/1995, de 28 de diciembre, sobre medidas urgentes en materia presupuestaria, tributaria y financiera.", "fecha": "28/12/1995", "pres": "Felipe González", "partido": "PSOE", "conv": "08/01/1996", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=V&_iniciativas_id=130%2F000036"}, {"leg": 5, "tit": "Real Decreto-Ley 1/1996, de 19 de enero, por el que se conceden créditos extraordinarios y suplementarios destinados a atender la actualización de retribuciones y otras obligaciones de personal activo, la financiación de la sanidad pública, el traspaso de competencias a las Comunidades Autónomas en materia de Universidades, la participación en los ingresos del Estado de las Comunidades Autónomas y Corporaciones Locales y determinadas actuaciones inversoras en la cuenca del Guadalquivir.", "fecha": "19/01/1996", "pres": "Felipe González", "partido": "PSOE", "conv": "08/01/1996", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=V&_iniciativas_id=130%2F000037"}, {"leg": 5, "tit": "Real Decreto-Ley 2/1996, de 26 de enero, sobre determinadas prestaciones patrimoniales de carácter público gestionadas por la Administración General del Estado y los entes públicos de ella dependientes.", "fecha": "26/01/1996", "pres": "Felipe González", "partido": "PSOE", "conv": "08/01/1996", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=V&_iniciativas_id=130%2F000038"}, {"leg": 5, "tit": "Real Decreto-Ley 3/1996, de 26 de enero, de reforma parcial de la Ley 19/1994, de 6 de julio, de modificación del Régimen Económico y Fiscal de Canarias.", "fecha": "26/01/1996", "pres": "Felipe González", "partido": "PSOE", "conv": "08/01/1996", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=V&_iniciativas_id=130%2F000039"}, {"leg": 5, "tit": "Real Decreto-Ley 4/1996, de 1 de marzo, por el que se adoptan medidas urgentes para reparar los daños causados por las recientes inundaciones y temporales.", "fecha": "01/03/1996", "pres": "Felipe González", "partido": "PSOE", "conv": "08/01/1996", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=V&_iniciativas_id=130%2F000040"}, {"leg": 6, "tit": "Real Decreto-Ley 1/2000, de 14 de enero, sobre determinadas medidas de mejora de la protección familiar de la Seguridad Social.", "fecha": "14/01/2000", "pres": "José María Aznar", "partido": "PP", "conv": "17/01/2000", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=VI&_iniciativas_id=130%2F000085"}, {"leg": 8, "tit": "Real Decreto-Ley 1/2008, de 18 de enero, por el que se determina el Indicador Público de Renta de Efectos Múltiples (IPREM) para 2008 y se concede un crédito extraordinario en el presupuesto del Ministerio de Trabajo y Asuntos Sociales, por importe de 200.000.000 euros con destino a la acogida e integración de inmigrantes, así como al refuerzo educativo de los mismos.", "fecha": "18/01/2008", "pres": "José Luis Rodríguez Zapatero", "partido": "PSOE", "conv": "14/01/2008", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=VIII&_iniciativas_id=130%2F000052"}, {"leg": 9, "tit": "Real Decreto-Ley 18/2011, de 18 de noviembre, por el que se regulan las bonificaciones de cuotas a la Seguridad Social de los contratos de trabajo celebrados con personas con discapacidad por la Organización Nacional de Ciegos Españoles (ONCE) y se establecen medidas de Seguridad Social para las personas trabajadoras afectadas por la crisis de la bacteria 'E.coli'.", "fecha": "18/11/2011", "pres": "José Luis Rodríguez Zapatero", "partido": "PSOE", "conv": "26/09/2011", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=IX&_iniciativas_id=130%2F000055"}, {"leg": 9, "tit": "Real Decreto-Ley 19/2011, de 2 de diciembre, por el que se modifica el Real Decreto-Ley 16/2011, de 14 de octubre, por el que se crea el Fondo de Garantía de Depósitos de Entidades de Crédito.", "fecha": "02/12/2011", "pres": "José Luis Rodríguez Zapatero", "partido": "PSOE", "conv": "26/09/2011", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=IX&_iniciativas_id=130%2F000056"}, {"leg": 10, "tit": "Real Decreto-Ley 12/2015, de 30 de octubre, por el que se adoptan medidas urgentes para reparar los daños causados por los temporales de lluvia en la Comunidad Autónoma de Canarias y en el sur y este peninsular en los meses de septiembre y octubre de 2015.", "fecha": "30/10/2015", "pres": "Mariano Rajoy", "partido": "PP", "conv": "26/10/2015", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=X&_iniciativas_id=130%2F000076"}, {"leg": 12, "tit": "Real Decreto-ley 7/2019, de 1 de marzo, de medidas urgentes en materia de vivienda y alquiler.", "fecha": "01/03/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "04/03/2019", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XII&_iniciativas_id=130%2F000061"}, {"leg": 12, "tit": "Real Decreto-ley 6/2019, de 1 de marzo, de medidas urgentes para garantía de la igualdad de trato y de oportunidades entre mujeres y hombres en el empleo y la ocupación.", "fecha": "01/03/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "04/03/2019", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XII&_iniciativas_id=130%2F000062"}, {"leg": 12, "tit": "Real Decreto-ley 8/2019, de 8 de marzo, de medidas urgentes de protección social y de lucha contra la precariedad laboral en la jornada de trabajo.", "fecha": "08/03/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "04/03/2019", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XII&_iniciativas_id=130%2F000063"}, {"leg": 12, "tit": "Real Decreto-ley 9/2019, de 29 de marzo, por el que se modifica la Ley 14/1994, de 1 de junio, por la que se regulan las empresas de trabajo temporal, para su adaptación a la actividad de la estiba portuaria y se concluye la adaptación legal del régimen de los trabajadores para la prestación del servicio portuario de manipulación de mercancías.", "fecha": "29/03/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "04/03/2019", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XII&_iniciativas_id=130%2F000064"}, {"leg": 12, "tit": "Real Decreto-ley 10/2019, de 29 de marzo, por el que se prorroga para 2019 el destino del superávit de Comunidades Autónomas y de las Entidades Locales para inversiones financieramente sostenibles y se adoptan otras medidas en relación con las funciones del personal de las Entidades Locales con habilitación de carácter nacional.", "fecha": "29/03/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "04/03/2019", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XII&_iniciativas_id=130%2F000065"}, {"leg": 13, "tit": "Real Decreto-ley 11/2019, de 20 de septiembre, por el que se adoptan medidas urgentes para paliar los daños causados por temporales y otras situaciones catastróficas.", "fecha": "20/09/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "24/09/2019", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XIII&_iniciativas_id=130%2F000001"}, {"leg": 13, "tit": "Real Decreto-ley 14/2019, de 31 de octubre, por el que se adoptan medidas urgentes por razones de seguridad pública en materia de administración digital, contratación del sector público y telecomunicaciones.", "fecha": "31/10/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "24/09/2019", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XIII&_iniciativas_id=130%2F000004"}, {"leg": 13, "tit": "Real Decreto-ley 15/2019, de 8 de noviembre, por el que se adoptan medidas urgentes para la organización en España de la XXV Conferencia de Naciones Unidas sobre el Cambio Climático.", "fecha": "08/11/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "24/09/2019", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XIII&_iniciativas_id=130%2F000005"}, {"leg": 13, "tit": "Real Decreto-ley 16/2019, de 18 de noviembre, por el que se adoptan medidas relativas a la ejecución del presupuesto de la Seguridad Social.", "fecha": "18/11/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "24/09/2019", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XIII&_iniciativas_id=130%2F000006"}, {"leg": 13, "tit": "Real Decreto-ley 17/2019, de 22 de noviembre, por el que se adoptan medidas urgentes para la necesaria adaptación de parámetros retributivos que afectan al sistema eléctrico y por el que se da respuesta al proceso de cese de actividad de centrales térmicas de generación.", "fecha": "22/11/2019", "pres": "Pedro Sánchez", "partido": "PSOE", "conv": "24/09/2019", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XIII&_iniciativas_id=130%2F000007"}, {"leg": 14, "tit": "Real Decreto-ley 4/2023, de 11 de mayo, por el que se adoptan medidas urgentes en materia agraria y de aguas en respuesta a la sequía y al agravamiento de las condiciones del sector primario derivado del conflicto bélico en Ucrania y de las condiciones climatológicas, así como de promoción del uso del transporte público colectivo terrestre por parte de los jóvenes y prevención de riesgos laborales en episodios de elevadas temperaturas.", "fecha": "11/05/2023", "pres": "Pedro Sánchez", "partido": "PSOE + Unidas Podemos", "conv": "29/05/2023", "post": false, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XIV&_iniciativas_id=130%2F000096"}, {"leg": 14, "tit": "Real Decreto-ley 5/2023, de 28 de junio, por el que se adoptan y prorrogan determinadas medidas de respuesta a las consecuencias económicas y sociales de la Guerra de Ucrania, de apoyo a la reconstrucción de la isla de La Palma y a otras situaciones de vulnerabilidad; de transposición de Directivas de la Unión Europea en materia de modificaciones estructurales de sociedades mercantiles y conciliación de la vida familiar y la vida profesional de los progenitores y los cuidadores; y de ejecución y cumplimiento del Derecho de la Unión Europea.", "fecha": "28/06/2023", "pres": "Pedro Sánchez", "partido": "PSOE + Unidas Podemos", "conv": "29/05/2023", "post": true, "url": "https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XIV&_iniciativas_id=130%2F000097"}];
+const COL = {"PSOE":"#e30613","PP":"#0a8fd8","Unidas Podemos":"#7b3f98"};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const parties = r => r.partido.split(' + ');
+const partyLabel = v => v.includes(' + ') ? 'Coalición PSOE + UP' : v;
+const roman = n => { let o='',v=[[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; for(const [k,s] of v) while(n>=k){o+=s;n-=k;} return o; };
+
+const FILTERS = [
+  {id:'fPartido', ph:'Partido',     vals:r => [r.partido],     label:partyLabel},
+  {id:'fPres',    ph:'Presidente',  vals:r => [r.pres],        label:v => v},
+  {id:'fLeg',     ph:'Legislatura', vals:r => [String(r.leg)], label:v => roman(+v), sort:(a,b)=>a-b},
+];
+const matchMom = (r,m) => m==='all' || (m==='post') === r.post;
+const sel = () => ({fPartido:$('fPartido').value, fPres:$('fPres').value, fLeg:$('fLeg').value});
+const matches = (r, s, skip) =>
+  (skip==='fPartido' || !s.fPartido || r.partido===s.fPartido) &&
+  (skip==='fPres'    || !s.fPres    || r.pres===s.fPres) &&
+  (skip==='fLeg'     || !s.fLeg     || String(r.leg)===s.fLeg) &&
+  matchMom(r, $('fMom').value);
+
+// Rellena cada desplegable solo con valores compatibles con el resto de filtros
+function refreshOptions(){
+  let s = sel();
+  FILTERS.forEach(f => {
+    const vals = [...new Set(DATA.filter(r => matches(r,s,f.id)).flatMap(f.vals))];
+    vals.sort(f.sort || undefined);
+    if(s[f.id] && !vals.includes(s[f.id])) s[f.id] = '';
+    $(f.id).innerHTML = `<option value="">${f.ph}</option>` + vals.map(v => `<option value="${esc(v)}">${esc(f.label(v))}</option>`).join('');
+    $(f.id).value = s[f.id];
+  });
+}
+
+// Ancho fijo = el de la opción más larga posible (no cambia al filtrar)
+function sizeSelects(){
+  const ctx = document.createElement('canvas').getContext('2d');
+  const all = {
+    fPartido:['Partido',...new Set(DATA.map(r=>partyLabel(r.partido)))],
+    fPres:['Presidente',...new Set(DATA.map(r=>r.pres))],
+    fLeg:['Legislatura',...new Set(DATA.map(r=>roman(r.leg)))],
+    fMom:[...$('fMom').options].map(o=>o.text),
+  };
+  for(const id in all){
+    const el = $(id), cs = getComputedStyle(el);
+    ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const w = Math.max(...all[id].map(t => ctx.measureText(t).width));
+    el.parentElement.style.width = Math.ceil(w + 10 + 34 + 4 + 4) + 'px';
+  }
+}
+
+function partyHtml(r){
+  const ps = parties(r), c = p => COL[p]||'#000';
+  return `<span style="color:${c(ps[0])}">(</span>` +
+    ps.map(p => `<span style="color:${c(p)}">${esc(p)}</span>`).join(' + ') +
+    `<span style="color:${c(ps[ps.length-1])}">)</span>`;
+}
+
+function render(){
+  const p=$('fPartido').value, pr=$('fPres').value, l=$('fLeg').value, m=$('fMom').value;
+  const rows = DATA.filter(r => matches(r, {fPartido:p, fPres:pr, fLeg:l}));
+  const n = rows.length;
+  const box = t => `<span class="box">${esc(t)}</span>`;
+
+  const bg = v => { const c = parties({partido:v}).map(x => COL[x]); return c.length>1 ? `linear-gradient(90deg,${c[0]} 50%,${c[1]} 50%)` : c[0]; };
+  const pbox = v => `<span class="box" style="background:${bg(v)};color:#fff">${esc(partyLabel(v))}</span>`;
+  let who = '';
+  if(pr) who = box(pr);
+  else if(p) who = (p.includes('+') ? 'La ' : 'El ') + pbox(p);
+  const legTxt = l ? ` en la ${box('legislatura '+roman(+l))}` : '';
+  const perfect = p==='PSOE' || pr==='Pedro Sánchez';
+  const num = box(`${n} ${n===1?'decreto':'decretos'}`);
+  const post = m==='post';
+  let s;
+  if(who){
+    const verb = perfect ? 'ha presentado' : 'presentó';
+    s = `${who} ${verb} ${num}` + (post ? ' tras la convocatoria de elecciones' : ' aprobados por la Diputación Permanente') + `${legTxt}.`;
+  } else if(post){
+    s = `Se ${n===1?'ha presentado':'han presentado'} ${num} tras la convocatoria de elecciones${legTxt}.`;
+  } else {
+    s = `Se ${n===1?'ha aprobado':'han aprobado'} ${num} por la Diputación Permanente${legTxt}.`;
+  }
+  $('summary').innerHTML = s;
+
+  $('cards').innerHTML = n ? rows.map(r => `
+    <article class="card">
+      <h2>${esc(r.tit)}<a href="${esc(r.url)}" target="_blank" rel="noopener" title="Ver en el Congreso">🡭</a></h2>
+      <div class="pres">${esc(r.pres)} ${partyHtml(r)}</div>
+      <i class="leg">Legislatura ${roman(r.leg)}</i>
+      <div class="dates"><div>· <b>Fecha del RDL:</b> ${r.fecha}</div><div>· <b>Convocatoria de elecciones:</b> ${r.conv}</div></div>
+    </article>`).join('') : '<p class="empty">No hay decretos con esta combinación.</p>';
+}
+['fPartido','fPres','fLeg','fMom'].forEach(id => $(id).addEventListener('change', () => { refreshOptions(); render(); }));
+refreshOptions(); sizeSelects(); render();
+if(document.fonts) document.fonts.ready.then(sizeSelects);
+</script>
+</body>
+</html>
