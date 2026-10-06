@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buscador de proyectos de ley decaídos</title>
+<style>
+:root{--v:#01f3b3;--g:#494949;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+body{margin:0;background:#fff;color:var(--g)}
+main{padding:32px 40px}
+h1{margin:0 0 20px;font-size:28px;font-weight:700}
+.b{display:flex;gap:12px;flex-wrap:wrap}
+input,select,button{font-size:16px;color:var(--g);background:#fff;border:1px solid var(--g);border-radius:6px;padding:12px 14px}
+input{flex:1 1 360px}select{flex:0 1 420px;max-width:100%}
+input:focus,select:focus{outline:none;border-color:var(--v);box-shadow:0 0 0 3px rgba(1,243,179,.35)}
+button{cursor:pointer}button:hover{background:var(--v);border-color:var(--v)}
+#n{margin:18px 0;font-size:14px}
+.c{width:100%;border:1px solid #ddd;border-left:6px solid var(--v);border-radius:6px;padding:18px 22px;margin-bottom:14px}
+.c h2{margin:0 0 8px;font-size:18px;font-weight:400;line-height:1.35}
+.c h2 a{color:var(--g);text-decoration:none}
+.c h2 a:hover{text-decoration:underline;text-decoration-color:var(--v);text-decoration-thickness:3px}
+.c h2 a::after{content:"\2197";display:inline-block;margin-left:8px;font-size:.8em;font-weight:700;-webkit-text-stroke:.8px var(--v);color:var(--v);text-decoration:none}
+.id{display:inline-block;background:var(--v);color:var(--g);font-weight:700;font-size:13px;padding:3px 10px;border-radius:4px;text-decoration:none;margin-bottom:10px}
+.id:hover{text-decoration:underline}
+.m{font-size:14px;line-height:1.7}.m span{margin-right:26px;display:inline-block}
+.e{padding:40px 0;text-align:center}
+</style>
+</head>
+<body>
+<main>
+<h1>Buscador de proyectos de ley decaídos</h1>
+<div class="b">
+<input id="q" type="search" placeholder="Escribe una palabra del título o el número de ID…">
+<select id="com"><option value="">Todas las comisiones</option></select>
+<select id="ord"><option value="">Orden original</option><option value="desc">Fecha de registro: más reciente primero</option><option value="asc">Fecha de registro: más antigua primero</option></select>
+<button id="lim">Limpiar</button>
+</div>
+<div id="n"></div>
+<div id="l"></div>
+</main>
+<script>
+const P=["Comisión de Cultura","Comisión de Derechos Sociales y Consumo","Comisión de Trabajo, Eco. Social, Inclusión, S.Social y Migraciones","Comisión de Hacienda y Función Pública","Comisión de Justicia","Comisión de Economía, Comercio y Transformación Digital","Comisión de Sanidad","Comisión de Vivienda y Agenda Urbana","Comisión de Transportes y Movilidad Sostenible","Comisión de Transición Ecológica y Reto Demográfico","Comisión Constitucional","Comisión de Política Territorial","Comisión de Industria y Turismo","Comisión de Juventud e Infancia","Comisión de Agricultura, Pesca y Alimentación","Comisión de Interior","Comisión de Educación, Formación Profesional y Deportes","Comisión de Igualdad"];
+const ST={E:"Enmiendas desde ",I:"Informe desde ",M:"Mesa - Calificación desde ",D:"Debate de totalidad desde "};
+const R=[
+[13,"Proyecto de Ley de creación de la Oficina Española de Derechos de Autor y Conexos, O.A.",0,"29/02/2024","I31/10/2024"],
+[11,"Proyecto de Ley de Familias.",1,"29/02/2024","E08/03/2024"],
+[8,"Proyecto de Ley por la que se modifican el texto refundido de la Ley del Estatuto de los Trabajadores, aprobado por el Real Decreto Legislativo 2/2015, de 23 de octubre, y otras disposiciones en materia laboral, para la transposición de la Directiva (UE) 2019/1152 del Parlamento Europeo y del Consejo, de 20 de junio de 2019, relativa a unas condiciones laborales transparentes y previsibles en la Unión Europea.",2,"09/02/2024","I21/03/2024"],
+[3,"Proyecto de Ley por la que se adoptan medidas para afrontar las consecuencias económicas y sociales derivadas de los conflictos en Ucrania y Oriente Próximo, así como para paliar los efectos de la sequía (procedente del Real Decreto-ley 8/2023, de 27 de diciembre).",3,"10/01/2024","I07/03/2024"],
+[2,"Proyecto de Ley por la que se aprueban medidas urgentes para la ejecución del Plan de Recuperación, Transformación y Resiliencia en materia de servicio público de justicia, función pública, régimen local y mecenazgo (procedente del Real Decreto-ley 6/2023, de 19 de diciembre).",4,"10/01/2024","I07/03/2024"],
+[18,"Proyecto de Ley por la que se crea la Autoridad Administrativa Independiente de Defensa del Cliente Financiero para la resolución extrajudicial de conflictos entre las entidades financieras y sus clientes.",5,"21/03/2024","I05/12/2024"],
+[21,"Proyecto de Ley de universalidad del Sistema Nacional de Salud.",6,"17/05/2024","E24/05/2024"],
+[24,"Proyecto de Ley por la que se prorrogan las medidas de suspensión de lanzamientos sobre la vivienda habitual para la protección de los colectivos vulnerables (procedente del Real Decreto-ley 1/2024, de 14 de mayo).",7,"13/06/2024","E21/06/2024"],
+[26,"Proyecto de Ley del Cine y de la Cultura Audiovisual.",0,"14/06/2024","I25/06/2026"],
+[27,"Proyecto de Ley por la que se adoptan medidas urgentes para la simplificación y mejora del nivel asistencial de la protección por desempleo, y para completar la transposición de la Directiva (UE) 2019/1158 del Parlamento Europeo y del Consejo, de 20 de junio de 2019, relativa a la conciliación de la vida familiar y la vida profesional de los progenitores y los cuidadores, y por la que se deroga la Directiva 2010/18/UE del Consejo (procedente del Real Decreto-ley 2/2024, de 21 de mayo).",2,"20/06/2024","E28/06/2024"],
+[28,"Proyecto de Ley de medidas de promoción del uso del transporte público colectivo terrestre por parte de los jóvenes para los viajes realizados en el periodo estival de 2024 (procedente del Real Decreto-ley 3/2024, de 4 de junio).",8,"20/06/2024","E28/06/2024"],
+[29,"Proyecto de Ley por la que se modifican diversas normas para consolidar la equidad y cohesión del Sistema Nacional de Salud.",6,"21/06/2024","E28/06/2024"],
+[31,"Proyecto de Ley de la Función Pública de la Administración del Estado.",3,"17/07/2024","I20/02/2025"],
+[32,"Proyecto de Ley por la que se prorrogan determinadas medidas para afrontar las consecuencias económicas y sociales derivadas de los conflictos en Ucrania y Oriente Próximo y se adoptan medidas urgentes en materia fiscal, energética y social (procedente del Real Decreto-ley 4/2024, de 26 de junio).",3,"23/07/2024","E30/08/2024"],
+[35,"Proyecto de Ley de restablecimiento de la Comisión Nacional de la Energía, A.A.I.",9,"26/09/2024","E11/10/2024"],
+[34,"Proyecto de Ley de modificación del Texto Refundido de la Ley de Puertos del Estado y de la Marina Mercante, aprobado por el Real Decreto Legislativo 2/2011, de 5 de septiembre, y de la Ley 14/2014, de 24 de julio, de Navegación Marítima.",8,"01/08/2024","I20/11/2025"],
+[37,"Proyecto de Ley por la que se modifica la Ley 17/2006, de 5 de junio, de la radio y la televisión de titularidad estatal, para adoptar medidas urgentes relativas al régimen jurídico aplicable a la Corporación RTVE (procedente del Real Decreto-ley 5/2024, de 22 de octubre).",10,"30/10/2024","E15/11/2024"],
+[39,"Proyecto de Ley por la que se adoptan medidas urgentes de respuesta ante los daños causados por la Depresión Aislada en Niveles Altos (DANA) en diferentes municipios entre el 28 de octubre y el 4 de noviembre de 2024 (procedente del Real Decreto-ley 6/2024, de 5 de noviembre).",11,"21/11/2024","E29/11/2024"],
+[38,"Proyecto de Ley de información empresarial sobre sostenibilidad, mediante la que se modifican el Código de Comercio, la Ley de Sociedades de Capital y la Ley de Auditoría de Cuentas.",4,"31/10/2024","E15/11/2024"],
+[42,"Proyecto de Ley por la que se adoptan medidas urgentes para el impulso del Plan de respuesta inmediata, reconstrucción y relanzamiento frente a los daños causados por la Depresión Aislada en Niveles Altos (DANA) en diferentes municipios entre el 28 de octubre y el 4 de noviembre de 2024 (procedente del Real Decreto-ley 7/2024, de 11 de noviembre).",11,"12/12/2024","E20/12/2024"],
+[40,"Proyecto de Ley por la que se modifica la Ley 1/2000, de 7 de enero, de Enjuiciamiento Civil, para regular el procedimiento de determinación de la edad.",4,"22/11/2024","D25/02/2025 hasta 13/03/2025"],
+[43,"Proyecto de Ley de Industria y Autonomía Estratégica.",12,"13/12/2024","E20/12/2024"],
+[44,"Proyecto de Ley por la que se adoptan medidas urgentes complementarias en el marco del Plan de respuesta inmediata, reconstrucción y relanzamiento frente a los daños causados por la Depresión Aislada en Niveles Altos (DANA) en diferentes municipios entre el 28 de octubre y el 4 de noviembre de 2024 (procedente del Real Decreto-ley 8/2024, de 28 de noviembre).",11,"19/12/2024","E22/01/2025"],
+[41,"Proyecto de Ley Orgánica por la que se modifica la Ley Orgánica 5/2000, de 12 de enero, reguladora de la responsabilidad penal de los menores, complementaria de la Ley por la que se modifica la Ley 1/2000, de 7 de enero, de Enjuiciamiento Civil, para regular el procedimiento de determinación de la edad.",4,"22/11/2024","D25/02/2025 hasta 13/03/2025"],
+[45,"Proyecto de Ley para la mejora de la compatibilidad de la pensión de jubilación con el trabajo (procedente del Real Decreto-ley 11/2024, de 23 de diciembre).",2,"22/01/2025","E07/02/2025"],
+[46,"Proyecto de Ley de transparencia e integridad de las actividades de los grupos de interés.",3,"30/01/2025","I11/09/2025"],
+[47,"Proyecto de Ley por la que se aprueban medidas urgentes en materia económica, de transporte, de Seguridad Social, y para hacer frente a situaciones de vulnerabilidad (procedente del Real Decreto-ley 1/2025, de 28 de enero).",3,"12/02/2025","E21/02/2025"],
+[48,"Proyecto de Ley de acciones colectivas para la protección y defensa de los derechos e intereses de los consumidores y usuarios.",4,"27/02/2025","E14/03/2025"],
+[49,"Proyecto de Ley de administradores y compradores de créditos y por la que se modifican la Ley de Medidas de Reforma del Sistema Financiero, la Ley de contratos de crédito al consumo, la Ley de ordenación, supervisión y solvencia de entidades de crédito, la Ley reguladora de los contratos de crédito inmobiliario, y el texto refundido de la Ley Concursal.",5,"05/03/2025","E14/03/2025"],
+[50,"Proyecto de Ley de prevención del consumo de bebidas alcohólicas y de sus efectos en las personas menores de edad.",6,"12/03/2025","E21/03/2025"],
+[52,"Proyecto de Ley Orgánica para la protección de las personas menores de edad en los entornos digitales.",4,"27/03/2025","I27/11/2025"],
+[55,"Proyecto de Ley por la que se aprueban medidas urgentes para la garantía del interés superior de la infancia y adolescencia ante situaciones de contingencias migratorias extraordinarias (procedente del Real Decreto-ley 2/2025, de 18 de marzo).",13,"10/04/2025","E09/05/2025"],
+[57,"Proyecto de Ley de medidas urgentes de respuesta a la amenaza arancelaria y de relanzamiento comercial (procedente del Real Decreto-ley 4/2025, de 8 de abril).",5,"08/05/2025","E16/05/2025"],
+[56,"Proyecto de Ley por la que se establece el programa de incentivos ligados a la movilidad eléctrica (MOVES III) para el año 2025 (procedente del Real Decreto-ley 3/2025, de 1 de abril).",9,"10/04/2025","E09/05/2025"],
+[59,"Proyecto de Ley Orgánica por la que se modifica la Ley Orgánica 6/1985, de 1 de julio, del Poder Judicial, y la Ley 50/1981, de 30 de diciembre, por la que se regula el Estatuto Orgánico del Ministerio Fiscal, para la ampliación y fortalecimiento de las carreras judicial y fiscal.",4,"16/05/2025","I21/06/2025"],
+[62,"Proyecto de Ley de medidas de promoción del uso del transporte público colectivo por parte de la juventud para los viajes realizados en el periodo estival de 2025 (procedente del Real Decreto-ley 5/2025, de 10 de junio).",8,"26/06/2025","E11/07/2025"],
+[63,"Proyecto de Ley Orgánica por la que se modifica la Ley Orgánica 5/1985, de 19 de junio, del Régimen Electoral General.",10,"09/07/2025","E24/07/2025"],
+[65,"Proyecto de Ley por la que se adoptan medidas relativas a los recursos de los sistemas de financiación territorial (procedente del Real Decreto-ley 6/2025, de 17 de junio).",3,"22/07/2025","E05/09/2025"],
+[67,"Proyecto de Ley de Información Clasificada.",10,"23/07/2025","E29/08/2025"],
+[66,"Proyecto de Ley por la que se declaran diversas iniciativas y programas como acontecimientos de excepcional interés público (procedente del Real Decreto-ley 8/2025, de 8 de julio).",0,"22/07/2025","E05/09/2025"],
+[69,"Proyecto de Ley por la que se amplía el permiso de nacimiento y cuidado, mediante la modificación del texto refundido de la Ley del Estatuto de los Trabajadores, aprobado por el Real Decreto Legislativo 2/2015, de 23 de octubre, el texto refundido de la Ley del Estatuto Básico del Empleado Público, aprobado por el Real Decreto Legislativo 5/2015, de 30 de octubre, y el texto refundido de la Ley General de la Seguridad Social, aprobado por el Real Decreto Legislativo 8/2015, de 30 de octubre, para completar la transposición de la Directiva (UE) 2019/1158 del Parlamento Europeo y del Consejo, de 20 de junio de 2019, relativa a la conciliación de la vida familiar y la vida profesional de los progenitores y los cuidadores, y por la que se deroga la Directiva 2010/18/UE del Consejo (procedente del Real Decreto-ley 9/2025, de 29 de julio).",2,"09/09/2025","E19/09/2025"],
+[68,"Proyecto de Ley por la que se modifican diversas disposiciones legales para la mejora de la gobernanza democrática en servicios digitales y ordenación de los medios de comunicación.",5,"30/07/2025","E29/08/2025"],
+[70,"Proyecto de Ley por la que se adoptan medidas urgentes contra el genocidio en Gaza y de apoyo a la población palestina (procedente del Real Decreto-ley 10/2025, de 23 de septiembre).",5,"08/10/2025","E17/10/2025"],
+[71,"Proyecto de Ley de modificación parcial de la Ley 39/2015, de 1 de octubre, del Procedimiento Administrativo Común de las Administraciones Públicas, y de la Ley 40/2015, de 1 de octubre, de Régimen Jurídico del Sector Público, en materia de responsabilidad patrimonial del Estado legislador por daños derivados de la infracción del Derecho de la Unión Europea.",3,"09/10/2025","E17/10/2025"],
+[73,"Proyecto de Ley de control, inspección y régimen sancionador de la pesca marítima.",14,"23/10/2025","E31/10/2025"],
+[72,"Proyecto de Ley Orgánica por la que se modifica la Ley Orgánica 10/1995, de 23 de noviembre, del Código Penal, para la transposición de la Directiva (UE) 2024/1226 del Parlamento Europeo y del Consejo, de 24 de abril de 2024, relativa a la definición de los delitos y las sanciones por la vulneración de las medidas restrictivas de la Unión, y por la que se modifica la Directiva (UE) 2018/1673.",4,"23/10/2025","E31/10/2025"],
+[76,"Proyecto de Ley por la que se establecen medidas para el fortalecimiento del Sistema para la Autonomía y Atención a la Dependencia y cumplir con las obligaciones establecidas en la Ley 3/2024, de 30 de octubre, para mejorar la calidad de vida de las personas con Esclerosis Lateral Amiotrófica y otras enfermedades o procesos de alta complejidad y curso irreversible (procedente del Real Decreto-ley 11/2025, de 21 de octubre).",1,"19/11/2025","E28/11/2025"],
+[74,"Proyecto de Ley Orgánica de Enjuiciamiento Criminal.",4,"30/10/2025","E14/11/2025"],
+[77,"Proyecto de Ley para el intercambio de información entre los servicios de seguridad y aduanas de los Estados miembros de la Unión Europea.",15,"26/11/2025","E12/12/2025"],
+[75,"Proyecto de Ley por la que se modifican los criterios de tamaño de las empresas a efectos de información financiera.",5,"08/11/2025","E21/11/2025"],
+[78,"Proyecto de Ley por la que se adoptan medidas urgentes de reactivación, refuerzo y prevención en el marco del Plan de respuesta inmediata, reconstrucción y relanzamiento frente a los daños causados por la Depresión Aislada en Niveles Altos (DANA) en diferentes municipios entre el 28 de octubre y el 4 de noviembre de 2024 (procedente del Real Decreto-ley 12/2025, de 28 de octubre).",11,"27/11/2025","E12/12/2025"],
+[79,"Proyecto de Ley Orgánica de medidas excepcionales de sostenibilidad financiera para las comunidades autónomas de régimen común.",3,"11/12/2025","I01/10/2026"],
+[80,"Proyecto de Ley por la que se adoptan medidas complementarias urgentes para la recuperación económica y social de la isla de La Palma tras los daños ocasionados por las erupciones volcánicas (procedente del Real Decreto-ley 13/2025, de 25 de noviembre).",11,"11/12/2025","E19/12/2025"],
+[60,"Proyecto de Ley por la que se modifican la Ley 58/2003, de 17 de diciembre, General Tributaria, en materia de prescripción, recaudación, asistencia mutua y obligaciones de información; la Ley 35/2006, de 28 de noviembre, del Impuesto sobre la Renta de las Personas Físicas y de modificación parcial de las leyes de los Impuestos sobre Sociedades, sobre la Renta de no Residentes y sobre el Patrimonio, y la Ley 29/1987, de 18 de diciembre, del Impuesto sobre Sucesiones y Donaciones.",3,"05/06/2025","I30/10/2025"],
+[82,"Proyecto de Ley por la que se adoptan medidas urgentes para favorecer la actividad inversora de las entidades locales y de las comunidades autónomas, y por el que se modifica el Real Decreto 1007/2023, de 5 de diciembre, por el que se aprueba el Reglamento que establece los requisitos que deben adoptar los sistemas y programas informáticos o electrónicos que soporten los procesos de facturación de empresarios y profesionales, y la estandarización de formatos de los registros de facturación (procedente del Real Decreto-ley 15/2025, de 2 de diciembre).",11,"11/12/2025","E19/12/2025"],
+[81,"Proyecto de Ley por la que se aprueban medidas urgentes en materia de retribuciones en el ámbito del sector público (procedente del Real Decreto-ley 14/2025, de 2 de diciembre).",3,"11/12/2025","E19/12/2025"],
+[83,"Proyecto de Ley Orgánica reguladora del derecho de rectificación.",4,"16/01/2026","E30/01/2026"],
+[84,"Proyecto de Ley de medidas de promoción del uso del transporte público mediante la bonificación de abonos y títulos multiviaje (procedente del Real Decreto-ley 17/2025, de 23 de diciembre).",8,"27/01/2026","E13/02/2026"],
+[91,"Proyecto de Ley por la que se aprueba el Plan Integral de Respuesta a la Crisis en Oriente Medio (procedente del Real Decreto-ley 7/2026, de 20 de marzo).",9,"26/03/2026","E13/04/2026"],
+[85,"Proyecto de Ley de ayudas a las víctimas de los accidentes ferroviarios de Adamuz (Córdoba) y Gélida (Barcelona) (procedente del Real Decreto-ley 1/2026, de 27 de enero).",8,"26/02/2026","E13/03/2026"],
+[86,"Proyecto de Ley para la revalorización de las pensiones públicas y otras medidas urgentes en materia de Seguridad Social (procedente del Real Decreto-ley 3/2026, de 3 de febrero).",2,"26/02/2026","E13/03/2026"],
+[88,"Proyecto de Ley de protección y resiliencia de las entidades críticas.",15,"18/03/2026","E27/03/2026"],
+[87,"Proyecto de Ley del Estatuto de las personas en formación práctica no laboral.",2,"05/03/2026","E13/03/2026"],
+[90,"Proyecto de Ley por la que se modifica la Ley 20/2022, de 19 de octubre, de Memoria Democrática, sobre reconocimiento a favor de personas fallecidas o con lesiones incapacitantes por su actividad en defensa y reivindicación de la Democracia (procedente del Real Decreto-ley 6/2026, de 3 de marzo).",10,"26/03/2026","M23/04/2026"],
+[89,"Proyecto de Ley por la que se adoptan medidas urgentes en respuesta a los daños causados por diversos fenómenos meteorológicos adversos, de especial afectación en las comunidades autónomas de Andalucía y Extremadura (procedente del Real Decreto-ley 5/2026, de 17 de febrero).",3,"18/03/2026","E27/03/2026"],
+[92,"Proyecto de Ley por la que se modifican la Ley Orgánica 2/2006, de 3 de mayo, de Educación, y la Ley 4/2019, de 7 de marzo, de mejora de las condiciones para el desempeño de la docencia y la enseñanza en el ámbito de la educación no universitaria, y se adoptan otras medidas para la mejora del sistema educativo.",16,"23/04/2026","I17/09/2026"],
+[93,"Proyecto de Ley de medidas urgentes en materia de transporte (procedente del Real Decreto-ley 9/2026, de 14 de abril).",8,"30/04/2026","E18/05/2026"],
+[95,"Proyecto de Ley por la que se aprueban medidas tributarias urgentes y otras medidas de apoyo en respuesta a los daños causados a las víctimas de siniestros de la DANA y otras situaciones de emergencia (procedente del Real Decreto-ley 10/2026, de 28 de abril).",3,"20/05/2026","E29/05/2026"],
+[94,"Proyecto de Ley de gestión pública e integridad del Sistema Nacional de Salud.",6,"14/05/2026","E22/05/2026"],
+[96,"Proyecto de Ley Orgánica para el buen uso y la gobernanza de la inteligencia artificial.",5,"28/05/2026","E12/06/2026"],
+[97,"Proyecto de Ley por la que se modifica la aportación de los usuarios y sus beneficiarios en la prestación farmacéutica ambulatoria (procedente del Real Decreto-ley 11/2026, de 12 de mayo).",6,"28/05/2026","M01/10/2026"],
+[98,"Proyecto de Ley de las Organizaciones de Pacientes.",6,"11/06/2026","D10/09/2026"],
+[99,"Proyecto de Ley por la que se declaran diversas iniciativas y programas como acontecimientos de excepcional interés público (procedente del Real Decreto-ley 12/2026, de 26 de mayo).",0,"18/06/2026","E26/06/2026"],
+[100,"Proyecto de Ley por la que se adoptan medidas relativas a los recursos de los sistemas de financiación territorial (procedente del Real Decreto-ley 13/2026, de 2 de junio).",3,"18/06/2026","E26/06/2026"],
+[101,"Proyecto de Ley por la que se modifica la Ley 37/1992, de 28 de diciembre, del Impuesto sobre el Valor Añadido, para la transposición parcial de la Directiva (UE) 2025/516 del Consejo, de 11 de marzo de 2025, por la que se modifica la Directiva 2006/112/CE en lo que respecta a las normas del IVA en la era digital.",3,"19/06/2026","E26/06/2026"],
+[102,"Proyecto de Ley de medidas de promoción del uso del transporte público colectivo por parte de la juventud para los viajes realizados en el periodo estival de 2026 (procedente del Real Decreto-ley 14/2026, de 9 de junio).",8,"25/06/2026","E03/07/2026"],
+[103,"Proyecto de Ley Orgánica de protección civil de los derechos al honor, a la intimidad personal y familiar y a la propia imagen.",10,"13/07/2026","E27/07/2026"],
+[105,"Proyecto de Ley por la que se modifican diversas leyes para la digitalización y modernización del sector financiero.",5,"17/07/2026","E27/07/2026"],
+[104,"Proyecto de Ley de medidas extraordinarias para el fortalecimiento y consolidación del Sistema para la Autonomía y Atención a la Dependencia (procedente del Real Decreto-ley 17/2026, de 23 de junio).",1,"14/07/2026","E27/07/2026"],
+[107,"Proyecto de Ley por la que se adoptan determinadas medidas en el marco del Plan Integral de Respuesta a la Crisis en Oriente Medio (procedente del Real Decreto-ley 18/2026, de 29 de junio).",5,"23/07/2026","E11/09/2026"],
+[108,"Proyecto de Ley de medidas urgentes en materia de jubilación parcial anticipada del personal laboral de las Administraciones Públicas y de complemento de insularidad en Illes Balears (procedente del Real Decreto-ley 19/2026, de 29 de junio).",3,"23/07/2026","E11/09/2026"],
+[106,"Proyecto de Ley Orgánica de medidas en materia de violencia vicaria.",17,"17/07/2026","D21/09/2026 hasta 30/09/2026"],
+[109,"Proyecto de Ley de los medicamentos y productos sanitarios.",6,"24/07/2026","E11/09/2026"],
+[110,"Proyecto de Ley por la que se modifica la Ley 28/2005, de 26 de diciembre, de medidas sanitarias frente al tabaquismo y reguladora de la venta, el suministro, el consumo y la publicidad de los productos del tabaco.",6,"24/07/2026","E11/09/2026"],
+[112,"Proyecto de Ley del Estatuto Marco del personal estatutario de los servicios de salud.",6,"07/09/2026","E18/09/2026"],
+[111,"Proyecto de Ley Orgánica de Integridad Pública.",3,"31/07/2026","E11/09/2026"],
+[114,"Proyecto de Ley por la que se aprueban medidas urgentes de carácter social y económico de apoyo a la ciudad de Ceuta (procedente del Real Decreto-ley 22/2026, de 1 de septiembre).",11,"16/09/2026","E25/09/2026"],
+[113,"Proyecto de Ley por la que se establecen medidas urgentes de protección laboral y social frente a los incendios forestales (procedente del Real Decreto-ley 20/2026, de 29 de julio).",2,"09/09/2026","E18/09/2026"],
+[115,"Proyecto de Ley por la que se adoptan medidas fiscales y financieras urgentes que contribuyan a la reconstrucción económica y social de la isla de La Palma, así como medidas tendentes a promover la ejecución de inversiones por parte de las comunidades autónomas que han registrado superávits presupuestarios y excesos de financiación pendientes de aplicar de ejercicios anteriores a 2026 (procedente del Real Decreto-ley 23/2026, de 8 de septiembre).",11,"23/09/2026","E02/10/2026"]
+];
+const D=R.map(([n,t,p,f,s])=>{const ref="121/"+String(n).padStart(6,"0");
+return{id:ref,t,c:P[p],f,s:P[p]+" "+ST[s[0]]+s.slice(1),
+u:"https://www.congreso.es/es/busqueda-de-iniciativas?p_p_id=iniciativas&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_iniciativas_mode=mostrarDetalle&_iniciativas_legislatura=XV&_iniciativas_id="+encodeURIComponent(ref)}});
+const nm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const es=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const q=document.getElementById("q"),com=document.getElementById("com"),ord=document.getElementById("ord");
+const k=d=>d.f.split("/").reverse().join("");
+[...P].sort((a,b)=>a.localeCompare(b,"es")).forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;com.appendChild(o)});
+function go(){
+const t=nm(q.value).split(/\s+/).filter(Boolean);
+const r=D.filter(d=>(!com.value||d.c===com.value)&&t.every(w=>nm(d.t+" "+d.id).includes(w)));
+if(ord.value)r.sort((a,b)=>ord.value==="asc"?k(a).localeCompare(k(b)):k(b).localeCompare(k(a)));
+document.getElementById("n").textContent=r.length+" de "+D.length+" iniciativas";
+document.getElementById("l").innerHTML=r.length?r.map(d=>`<article class="c"><a class="id" href="${es(d.u)}" target="_blank" rel="noopener">${es(d.id)}</a><h2><a href="${es(d.u)}" target="_blank" rel="noopener">${es(d.t)}</a></h2><div class="m"><span><b>Comisión competente:</b> ${es(d.c)}</span><span><b>Fecha de registro:</b> ${es(d.f)}</span><br><span><b>Estado en el que decayó:</b> ${es(d.s)}</span></div></article>`).join(""):'<div class="e">No hay resultados.</div>';
+}
+q.oninput=go;com.onchange=go;ord.onchange=go;
+document.getElementById("lim").onclick=()=>{q.value="";com.value="";ord.value="";go()};
+go();
+</script>
+</body>
+</html>
