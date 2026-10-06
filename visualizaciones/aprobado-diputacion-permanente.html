@@ -108,6 +108,11 @@ function partyHtml(r){
     `<span style="color:${c(ps[ps.length-1])}">)</span>`;
 }
 
+const ts = d => { const [dd,mm,yy] = d.split('/'); return +(yy+mm+dd); };
+const timeline = r => [[r.conv,'Convocatoria electoral'],[r.fecha,'RDL'],[ELEC[r.conv],'Elecciones']]
+  .sort((a,b) => ts(a[0]) - ts(b[0]))
+  .map(([d,t]) => `<div><b>${d}</b> - ${t}</div>`).join('');
+
 function render(){
   const p=$('fPartido').value, pr=$('fPres').value, l=$('fLeg').value, m=$('fMom').value;
   const rows = DATA.filter(r => matches(r, {fPartido:p, fPres:pr, fLeg:l}));
@@ -139,7 +144,7 @@ function render(){
       <h2>${esc(r.tit)}<a href="${esc(r.url)}" target="_blank" rel="noopener" title="Ver en el Congreso">🡭</a></h2>
       <div class="pres">${esc(r.pres)} ${partyHtml(r)}</div>
       <i class="leg">Legislatura ${roman(r.leg)}</i>
-      <div class="dates"><div><b>${r.conv}</b> - Convocatoria electoral</div><div><b>${r.fecha}</b> - RDL</div><div><b>${ELEC[r.conv]}</b> - Elecciones</div></div>
+      <div class="dates">${timeline(r)}</div>
     </article>`).join('') : '<p class="empty">No hay decretos con esta combinación.</p>';
 }
 ['fPartido','fPres','fLeg','fMom'].forEach(id => $(id).addEventListener('change', () => { refreshOptions(); render(); }));
